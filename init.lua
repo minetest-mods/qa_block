@@ -7,7 +7,6 @@ function qa_block.out(...)
 	local out
 	local x
 	for x, out in ipairs(arg) do
-		print(out)
 		outsting = (outsting..tostring(out)..'\t')
 	end
 	print(outsting)
