@@ -1,6 +1,21 @@
 print("initialize Starting QA Block")
 
 
+local filepath = minetest.get_modpath("qa_block").."/checks/same_recipe.lua"
+minetest.register_chatcommand("qa_block", {
+	params = "",
+	description = "Perform qa block check",
+	privs = {interact = true},
+	func = function()
+		print("QA checks started")
+
+--- TODO: some selectoin of executed check
+		dofile(filepath)
+		print("QA checks finished. Have a look to the debug.txt")
+		return true, "QA checks finished."
+	end,
+})
+
 minetest.register_node("qa_block:block", {
 	description = "Check mods quality starter block",
         tiles = {"default_dirt.png","default_stone.png","default_sand.png"},
@@ -24,7 +39,7 @@ minetest.register_node("qa_block:block", {
 --			print(k,v)
 --
 --		        if type(v) == "table" and recursive == true  then
---				qa.dump_variables(v,false, "->") 
+--				qa.dump_variables(v,false, "->")
 --			end
 --		end
 --	end
@@ -35,7 +50,7 @@ minetest.register_on_placenode(function (pos, node)
 		print("QA checks started")
 
 --- TODO: some selectoin of executed check
-		dofile(minetest.get_modpath("qa_block").."/checks/same_recipe.lua")  
+		dofile(filepath)
 		print("QA checks finished. Have a look to the debug.txt")
 		minetest.env:add_node(pos, {name="air"})
         end
