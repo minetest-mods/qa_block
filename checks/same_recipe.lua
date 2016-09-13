@@ -78,14 +78,14 @@ for name, def in pairs(minetest.registered_items) do
 		local recipes_for_node = minetest.get_all_craft_recipes(name)
 		if recipes_for_node == nil then
 			if print_no_recipe then
-				qa_block.out(name, "no_recipe")
+				print(name, "no_recipe")
 			end
 		else
 	        	for kn, vn in ipairs(recipes_for_node) do
                 		for ku, vu in ipairs(known_recipes) do
                         		if vu.output ~= vn.output and
 		                      	   is_same_recipe(vu, vn) == true then
-						qa_block.out('same recipe', vu.output, vn.output)
+						print('same recipe', vu.output, vn.output)
 --	        	                      	print (dump(vu),dump(vn))   --debug
 	                	        end
 	        	        end

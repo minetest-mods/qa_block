@@ -1,31 +1,31 @@
 print("initialize Starting QA Block")
 
-qa_block = {}
 
-function qa_block.out(...)
+old_print = print
+print = function(...)
 	local outsting = ""
 	local out
 	local x
 	for x, out in ipairs(arg) do
 		outsting = (outsting..tostring(out)..'\t')
 	end
-	print(outsting)
+	old_print(outsting)
 	minetest.chat_send_all(outsting)
 end
-
 
 local filepath = minetest.get_modpath("qa_block").."/checks/"
 local defaultmodule = "same_recipe"
 
 
 local function do_module( module )
-	qa_block.out("QA checks started")
+
+	print("QA checks started")
 --- TODO: some selectoin of executed check
 	local file = filepath..module..".lua"
 
 	local f=io.open(file,"r")
 	if not f then
-		qa_block.out("file "..file.." not found")
+		print("file "..file.." not found")
 	else
 		io.close(f)
 		local compiled
@@ -33,17 +33,17 @@ local function do_module( module )
 		local err
 		local compiled, err = loadfile(file)
 		if not compiled then
-			qa_block.out("syntax error in module file"..file)
-			qa_block.out(err)
+			print("syntax error in module file"..file)
+			print(err)
 		else
 			executed, err = pcall(compiled)
 			if not executed then
-				qa_block.out("runtime error appears")
-				qa_block.out(err)
+				print("runtime error appears")
+				print(err)
 			end
 		end
 	end
-	qa_block.out("QA checks finished")
+	print("QA checks finished")
 
 end
 
