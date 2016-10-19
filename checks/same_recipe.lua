@@ -1,6 +1,56 @@
-local function is_same_item(item1, item2)
 
-	local enable_groupcheck = false
+local enable_groupcheck = false
+local enable_dependency_check = true
+
+if enable_dependency_check then
+	dofile(minetest.get_modpath("qa_block").."/modutils.lua")
+end
+
+
+local function dependency_exists(item1, item2)
+	if enable_dependency_check then
+
+		local delimpos
+		local modname1
+		local modname2
+		local depmod
+
+		-- check dependency item1 depends on item2
+		delimpos = string.find(item1, ":")
+		if delimpos then
+			modname1 = string.sub(item1, 1,  delimpos - 1)
+		end
+
+		delimpos = string.find(item2, ":")
+		if delimpos then
+			modname2 = string.sub(item2, 1,  delimpos - 1)
+		end
+
+		if not modname1 or modname1 == "group" or
+		   not modname2 or modname2 == "group" then
+			return false
+		end
+
+		if modname1 == modname2 then
+			return false --there should not be a redefinition in same module
+		end
+
+		depmod = modutils.get_depmod(modname1)
+		if depmod and depmod.check_depmod(item2) then
+			return true
+		end
+
+		depmod = modutils.get_depmod(modname2)
+		if depmod and  depmod.check_depmod(item1) then
+			return true
+		end
+	else
+		return false --no dependency if no check
+	end
+end
+
+
+local function is_same_item(item1, item2)
 
 	local chkgroup = nil
 	local chkitem = nil
@@ -22,7 +72,7 @@ local function is_same_item(item1, item2)
 		end
 
 		if item2:sub(1, 6) == "group:" then
-			if  chkgroup then -- defined from item1, but not the same in simple check
+			if chkgroup then -- defined from item1, but not the same in simple check
 				return false
 			else
 				chkgroup = item2:sub(7)
@@ -89,8 +139,10 @@ for name, def in pairs(minetest.registered_items) do
 				for ku, vu in ipairs(known_recipes) do
 					if vu.output ~= vn.output and
 					   is_same_recipe(vu, vn) == true then
-						print('same recipe', vu.output, vn.output)
---						print (dump(vu),dump(vn))   --debug
+						if not dependency_exists(vu.output, vn.output) then
+							print('same recipe', vu.output, vn.output)
+							--print (dump(vu),dump(vn))   --debug
+						end
 					end
 				end
 				table.insert(known_recipes,vn )
