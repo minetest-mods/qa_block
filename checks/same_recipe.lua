@@ -6,7 +6,6 @@ if enable_dependency_check then
 	dofile(minetest.get_modpath("qa_block").."/modutils.lua")
 end
 
-
 local function dependency_exists(item1, item2)
 	if enable_dependency_check then
 
@@ -36,12 +35,12 @@ local function dependency_exists(item1, item2)
 		end
 
 		depmod = modutils.get_depmod(modname1)
-		if depmod and depmod.check_depmod(item2) then
+		if depmod and depmod:check_depmod(item2) then
 			return true
 		end
 
 		depmod = modutils.get_depmod(modname2)
-		if depmod and  depmod.check_depmod(item1) then
+		if depmod and  depmod:check_depmod(item1) then
 			return true
 		end
 	else
