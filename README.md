@@ -5,7 +5,7 @@ License GPL-V3: https://www.gnu.org/licenses/gpl-3.0.html
 
 This is a developer helper mod, allow run any lua code for testing reason. The mod can list and run lua-scripts placed in checks subfolder. some check scrips provided.
 
-# Features
+#Features
   list files on DOS and *NIX OS
   redirection of print() output to minetest chat. (can be disabled by changing code line "print_to_chat"
   robust call of the scripts trough "pcall" does not crash the game in case of syntax- or runtime errors
