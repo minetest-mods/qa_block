@@ -1,4 +1,4 @@
-QA Block to check working together overlaps of mods
+QA Block to run checking scripts for beter quality assurance of code
 =======
 
 License GPL-V3: https://www.gnu.org/licenses/gpl-3.0.html
