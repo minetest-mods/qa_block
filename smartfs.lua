@@ -64,6 +64,11 @@ function smartfs.dynamic(name,player)
 		smartfs._dynamic_warned = true
 		print("SmartFS - (Warning) On the fly forms are being used. May cause bad things to happen")
 	end
+
+	-- obsolete api compatibility to previous versions
+	if type(player) == "string" then
+		player = minetest.get_player_by_name(player)
+	end -- obsolete api compatibility end
 	local state = smartfs._makeState_({name=name},player,nil,false)
 	state.show = state._show_
 	smartfs.opened[player:get_player_name()] = state
@@ -166,6 +171,8 @@ function smartfs._makeState_(form, newplayer, params, is_inv, nodepos)
 		def = form,
 		players = _make_players_(form, newplayer),
 		location = _make_location_(form, newplayer, params, is_inv, nodepos),
+		is_inv = is_inv, -- obsolete. Please use location.type="inventory" instead
+		player = newplayer:get_player_name(), -- obsolete. Please use location.player:get_player_name()
 		param = params or {},
 		get = function(self,name)
 			return self._ele[name]
