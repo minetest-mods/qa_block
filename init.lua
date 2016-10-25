@@ -8,15 +8,19 @@ local print_to_chat = true
 local modpath = minetest.get_modpath("qa_block")
 local filepath = modpath.."/checks/"
 
-
 -----------------------------------------------
 -- Load external libs and other files
 -----------------------------------------------
 qa_block = {} -- needed as envroot in tools
-
 local thismodpath = minetest.get_modpath(minetest.get_current_modname())
-local smartfsmod = minetest.get_modpath("smartfs")
 
+--- temporary provide smartfs as builtin, till the needed changes are upstream
+dofile(thismodpath.."/smartfs.lua") --3rd party smarfs
+local smartfs = qa_block.smartfs
+local smartfsmod = "qa_block"
+--- temporary end
+
+--local smartfsmod = minetest.get_modpath("smartfs")
 if smartfsmod then --smartfs is optional
 	dofile(thismodpath.."/smartfs_forms.lua") --qa_block forms
 end

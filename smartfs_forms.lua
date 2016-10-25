@@ -1,5 +1,10 @@
 -- the smartfs.lua is loaded
 
+--- temporary provide smartfs as builtin, till the needed changes are upstream
+local smartfs = qa_block.smartfs
+--- temporary end
+
+
 qa_block.fs = smartfs.create("qa_block:block", function(state)
 
 	state:size(10,7)

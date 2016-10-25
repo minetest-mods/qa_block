@@ -13,7 +13,7 @@ This is a developer helper mod, allow run any lua code for testing reason. The m
 
 # Dependencies
 - default - some default tiles and sounds used on block from default
-- smartfs - optional, enable GUI for check selection (latest version from my fork https://github.com/bell07/minetest-smartfs till the push request is accepted)
+- smartfs - optional, enable GUI for check selection - currently built-in till needed changes are in upstream
 
 # Available check modules
 - same_recipe - check installed items for similar recipe
