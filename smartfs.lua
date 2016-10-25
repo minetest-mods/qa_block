@@ -168,7 +168,7 @@ function smartfs._makeState_(form, newplayer, params, is_inv, nodepos)
 	-- compatibility to older api
 	local _make_obsolete_player_ = function(player)
 		if player then
-			return get_player_name()
+			return player:get_player_name()
 		end
 	end
 
@@ -179,7 +179,7 @@ function smartfs._makeState_(form, newplayer, params, is_inv, nodepos)
 		players = _make_players_(form, newplayer),
 		location = _make_location_(form, newplayer, params, is_inv, nodepos),
 		is_inv = is_inv, -- obsolete. Please use location.type="inventory" instead
-		player = _make_obsolete_player_(), -- obsolete. Please use location.player:get_player_name()
+		player = _make_obsolete_player_(newplayer), -- obsolete. Please use location.player:get_player_name()
 		param = params or {},
 		get = function(self,name)
 			return self._ele[name]
