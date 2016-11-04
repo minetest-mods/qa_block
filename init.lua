@@ -132,23 +132,17 @@ minetest.register_node("qa_block:block", {
 	description = "Check mods quality starter block",
 	tiles = {"qa_block.png"},
 	groups = {cracky = 3},
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		if smartfsmod then
+			qa_block.fs:attach_nodemeta(pos, placer) --(:form, nodepos, params, placer)
+		else --not a smartfs mod selection dialog. Just run the default one
+			qa_block.do_module(defaultmodule)
+			minetest:remove_node(pos)
+		end
+	end,
 	on_receive_fields = function(pos, formname, fields, sender)
 		if smartfsmod then
 			smartfs.nodemeta_on_receive_fields(pos, formname, fields, sender)
 		end
 	end
 })
-
------------------------------------------------
--- Block node - start execution trough block placing
------------------------------------------------
-minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-	if newnode.name == "qa_block:block" then
-		if smartfsmod then
-			qa_block.fs:attach_nodemeta(pos, placer) --(:form, nodepos, params, placer)
-		else --not a smartfs mod selection dialog. Just run the default one
-			qa_block.do_module(defaultmodule)
-			minetest.env:remove_node(pos)
-		end
-	end
-end)
