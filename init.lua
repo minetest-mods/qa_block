@@ -130,9 +130,8 @@ minetest.register_chatcommand("qa_block", {
 -----------------------------------------------
 minetest.register_node("qa_block:block", {
 	description = "Check mods quality starter block",
-	tiles = {"default_dirt.png","default_stone.png","default_sand.png"},
+	tiles = {"qa_block.png"},
 	groups = {cracky = 3},
-	sounds = default.node_sound_stone_defaults(),
 	on_receive_fields = function(pos, formname, fields, sender)
 		if smartfsmod then
 			smartfs.nodemeta_on_receive_fields(pos, formname, fields, sender)
