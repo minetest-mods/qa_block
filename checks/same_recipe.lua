@@ -1,12 +1,16 @@
-
+-- parameters
 local enable_groupcheck = false
 local enable_dependency_check = true
+local print_no_recipe = false
+-------------
+
 
 if enable_dependency_check then
 	dofile(minetest.get_modpath("qa_block").."/modutils.lua")
 end
 
 local function dependency_exists(item1, item2)
+
 	if enable_dependency_check then
 
 		local delimpos
@@ -47,7 +51,6 @@ local function dependency_exists(item1, item2)
 		return false --no dependency if no check
 	end
 end
-
 
 local function is_same_item(item1, item2)
 
@@ -115,10 +118,7 @@ local function is_same_recipe(rec1, rec2)
 end
 
 
-
-
 local known_recipes = {}
-local print_no_recipe = false
 
 -- load and execute file each click
 --for name, def in pairs(minetest.registered_nodes) do
