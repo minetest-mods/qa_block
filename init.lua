@@ -99,10 +99,10 @@ end
 local command_params
 if smartfsmod then
 	command_params = "[<check_module> | ls | sel ]"
-	command_description = "Perform a mod Quality Assurance check. ls = list available check modules; sel = Open form",
+	command_description = "Perform a mod Quality Assurance check. ls = list available check modules; sel = Open form"
 else
 	command_params = "[<check_module> | ls ]"
-	command_description = "Perform a mod Quality Assurance check. ls = list available check modules",
+	command_description = "Perform a mod Quality Assurance check. ls = list available check modules"
 end
 
 minetest.register_chatcommand("qa", {
