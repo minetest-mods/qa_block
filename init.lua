@@ -16,6 +16,7 @@ local thismodpath = minetest.get_modpath(minetest.get_current_modname())
 
 --- temporary provide smartfs as builtin, till the needed changes are upstream
 dofile(thismodpath.."/smartfs.lua") --3rd party smarfs
+dofile(modpath .. "/check_names.lua") -- Get checker descriptions
 local smartfs = qa_block.smartfs
 local smartfsmod = "qa_block"
 --- temporary end
@@ -35,13 +36,21 @@ qa_block.get_checks_list = function()
 	for f=1, #files do
 		local filename = files[f]
 		local outname, _ext = filename:match("(.*)(.lua)$")
-		table.insert(out, outname)
+		local realname = qa_block.check_names[outname]
+		table.insert(out, {id = outname, description = realname})
 	end
 
-	table.sort(out,function(a,b) return a<b end)
+	table.sort(out, function(a, b)
+		if a.description ~= nil and b.description ~= nil then
+			return a.description < b.description
+		else
+			return a.id < b.id
+		end
+	end)
 	return out
 end
 
+qa_block.checks_list = qa_block.get_checks_list()
 
 -----------------------------------------------
 -- QA-Block functionality - redefine print - reroute output to chat window
@@ -102,14 +111,20 @@ minetest.register_chatcommand("qa_block", {
 	privs = {interact = true},
 	func = function(name, param)
 		if param == "ls" then
-			for idx, file in ipairs(qa_block.get_checks_list()) do
-				print(file)
+			for _, check in ipairs(qa_block.checks_list) do
+				local out
+				if check.description then
+					out = string.format("%s: %s", check.id, check.description)
+				else
+					out = check.id
+				end
+				minetest.chat_send_player(name, out)
 			end
 		elseif param == "sel" then
 			if smartfsmod then
 				qa_block.fs:show(name)
 			else
-				print("selection screen not supported without smartfs")
+				minetest.chat_send_player(name, "Error: Selection screen not supported without smartfs!")
 			end
 		elseif param and param ~= "" then
 			qa_block.do_module(param)
