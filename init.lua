@@ -51,8 +51,9 @@ end
 -----------------------------------------------
 -- QA-Block functionality - redefine print - reroute output to chat window
 -----------------------------------------------
+
 if print_to_chat then
-	old_print = print
+	local old_print = print
 	print = function(...)
 		local outsting = ""
 		local out
@@ -131,7 +132,7 @@ minetest.register_chatcommand("qa_block", {
 minetest.register_node("qa_block:block", {
 	description = "Check mods quality starter block",
 	tiles = {"qa_block.png"},
-	groups = {cracky = 3},
+	groups = {cracky = 3, dig_immediate = 2 },
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		if smartfsmod then
 			qa_block.fs:attach_nodemeta(pos, placer) --(:form, nodepos, params, placer)
