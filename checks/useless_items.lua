@@ -70,7 +70,7 @@ local check = function(name, def)
 
 	end
 	-- Are there any callback functions defined?
-	if def.on_use ~= nil or def.after_use ~= nil or is_custom(def.on_secondary_use) or is_custom(def.on_place) or is_custom(on_drop) then
+	if def.on_use ~= nil or def.after_use ~= nil or is_custom(def.on_secondary_use) or is_custom(def.on_place) or is_custom(def.on_drop) then
 		return
 	end
 
