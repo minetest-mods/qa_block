@@ -13,21 +13,25 @@ local function dependency_exists(item1, item2)
 
 	if enable_dependency_check then
 
-		local delimpos
 		local modname1
 		local modname2
 		local depmod
+		local delimpos
+
+		--the items are from crafting output so maybe the counter needs to be cutted
+		delimpos = string.find(item1, " ")
+		if delimpos then
+			item1 = string.sub(item1, 1, delimpos - 1)
+		end
+
+		delimpos = string.find(item2, " ")
+		if delimpos then
+			item2 = string.sub(item2, 1, delimpos - 1)
+		end
 
 		-- check dependency item1 depends on item2
-		delimpos = string.find(item1, ":")
-		if delimpos then
-			modname1 = string.sub(item1, 1,  delimpos - 1)
-		end
-
-		delimpos = string.find(item2, ":")
-		if delimpos then
-			modname2 = string.sub(item2, 1,  delimpos - 1)
-		end
+		modname1 = modutils.get_modname_by_itemname(item1)
+		modname2 = modutils.get_modname_by_itemname(item2)
 
 		if not modname1 or modname1 == "group" or
 		   not modname2 or modname2 == "group" then
@@ -139,7 +143,6 @@ for name, def in pairs(minetest.registered_items) do
 					   is_same_recipe(vu, vn) == true then
 						if not dependency_exists(vu.output, vn.output) then
 							print('same recipe', vu.output, vn.output)
-							--print (dump(vu),dump(vn))   --debug
 						end
 					end
 				end
