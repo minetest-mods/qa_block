@@ -48,9 +48,29 @@ local check = function(name, def)
 			end
 		end
 	end
+
+	-- This helper function checks whether a function is custom-defined by a mod (true) or comes from Minetest or builtin (false)
+	local is_custom = function(func)
+		if func == nil then
+			return false
+		end
+		if type(func) ~= "function" then
+			return true
+		end
+		local source = debug.getinfo(func).source
+		-- First character == "@" means it comes from a Lua script
+		if string.sub(source, 1, 1) == "@" then
+			-- Path: /builtin/game/init.lua
+			-- TODO: Test this on Windows, Mac OS, …
+			local builtin_path = DIR_DELIM .. "builtin" .. DIR_DELIM .. "game" .. DIR_DELIM .. "item.lua"
+			return not (string.sub(source, -string.len(builtin_path), -1) == builtin_path)
+		else
+			return false
+		end
+
+	end
 	-- Are there any callback functions defined?
-	-- TODO: Also check on_secondary use, on_place, on_drop
-	if def.on_use ~= nil or def.after_use ~= nil then
+	if def.on_use ~= nil or def.after_use ~= nil or is_custom(def.on_secondary_use) or is_custom(def.on_place) or is_custom(on_drop) then
 		return
 	end
 
