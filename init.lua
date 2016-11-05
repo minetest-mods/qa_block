@@ -96,7 +96,7 @@ end
 -----------------------------------------------
 -- Chat command to start checks
 -----------------------------------------------
-local command_params
+local command_params, command_description
 if smartfsmod then
 	command_params = "[<check_module> | ls | sel ]"
 	command_description = "Perform a mod Quality Assurance check. ls = list available check modules; sel = Open form"
