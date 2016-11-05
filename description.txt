@@ -1,0 +1,1 @@
+A developer tool for modders to perform various checks, such as duplicate crafting recipes.

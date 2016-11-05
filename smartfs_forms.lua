@@ -7,14 +7,14 @@ local smartfs = qa_block.smartfs
 
 qa_block.fs = smartfs.create("qa_block:block", function(state)
 	state:size(10,7)
-	state:label(0,0,"header","Please select a qa check and run by doble-click or Run button")
+	state:label(0,0,"header","Please select a mod check which you want to perform.")
 	if state.location.type == "nodemeta" then
-		state:label(0,0.5,"header2", "nodemeta: ".. minetest.pos_to_string(state.location.pos))
-	else
-		state:label(0,0.5,"header2", state.location.type..": "..state.location.player)
+		state:label(0,0.5,"header2", "Node position: ".. minetest.pos_to_string(state.location.pos))
+	elseif state.location.type == "player" then
+		state:label(0,0.5,"header2", "Player: "..state.location.player)
 	end
 -- Listbox
-	local listbox = state:listbox(0,1,10,5.5,"fileslist")
+	local listbox = state:listbox(0,1,10,5.25,"fileslist")
 	for idx, file in ipairs(qa_block.get_checks_list()) do
 		listbox:addItem(file)
 	end
@@ -30,10 +30,10 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 		if check then
 			qa_block.do_module(check)
 		else
-			print("no check selected")
+			print("Error: No check module selected.")
 		end
 	end)
 	
-	state:button(5,6.5,2,0.5,"Cancel","Cancel", true)
+	state:button(5,6.5,2,0.5,"Close","Close", true)
 	return true
 end)

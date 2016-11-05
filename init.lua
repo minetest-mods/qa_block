@@ -66,12 +66,12 @@ end
 -- QA-Block functionality - execute a module
 -----------------------------------------------
 qa_block.do_module = function(module)
-	print("QA checks started")
+	print("QA checks started.")
 	local file = filepath..module..".lua"
 
 	local f=io.open(file,"r")
 	if not f then
-		print("file "..file.." not found")
+		print("Error: File “"..file.."” not found.")
 	else
 		io.close(f)
 		local compiled
@@ -79,27 +79,36 @@ qa_block.do_module = function(module)
 		local err
 		local compiled, err = loadfile(file)
 		if not compiled then
-			print("syntax error in module file"..file)
+			print("Syntax error in file “"..file.."”")
 			print(err)
 		else
 			executed, err = pcall(compiled)
 			if not executed then
-				print("runtime error appears")
+				print("Runtime error in QA Block check module!")
 				print(err)
 			end
 		end
 	end
-	print("QA checks finished")
+	print("QA checks finished.")
 
 end
 
 -----------------------------------------------
 -- Chat command to start checks
 -----------------------------------------------
-minetest.register_chatcommand("qa_block", {
-	params = "<checkmodule>",
-	description = "Perform qa block check",
-	privs = {interact = true},
+local command_params, command_description
+if smartfsmod then
+	command_params = "[<check_module> | ls | sel ]"
+	command_description = "Perform a mod Quality Assurance check. ls = list available check modules; sel = Open form"
+else
+	command_params = "[<check_module> | ls ]"
+	command_description = "Perform a mod Quality Assurance check. ls = list available check modules"
+end
+
+minetest.register_chatcommand("qa", {
+	description = command_description,
+	params = command_params,
+	privs = {server = true},
 	func = function(name, param)
 		if param == "ls" then
 			for idx, file in ipairs(qa_block.get_checks_list()) do
@@ -125,7 +134,7 @@ minetest.register_chatcommand("qa_block", {
 -- Block node definition - with optional smartfs integration
 -----------------------------------------------
 minetest.register_node("qa_block:block", {
-	description = "Check mods quality starter block",
+	description = "Quality Assurance block",
 	tiles = {"qa_block.png"},
 	groups = {cracky = 3, dig_immediate = 2 },
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
