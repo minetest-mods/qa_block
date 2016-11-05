@@ -4,9 +4,9 @@ local enable_dependency_check = true
 local print_no_recipe = false
 -------------
 
-
+local modutils
 if enable_dependency_check then
-	dofile(minetest.get_modpath("qa_block").."/modutils.lua")
+	modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
 end
 
 local function dependency_exists(item1, item2)
@@ -37,14 +37,13 @@ local function dependency_exists(item1, item2)
 		if modname1 == modname2 then
 			return false --there should not be a redefinition in same module
 		end
-
-		depmod = modutils.get_depmod(modname1)
-		if depmod and depmod:check_depmod(item2) then
+		depmod = modutils.get_depend_checker(modname1)
+		if depmod and depmod:check_depend(item2) then
 			return true
 		end
 
-		depmod = modutils.get_depmod(modname2)
-		if depmod and  depmod:check_depmod(item1) then
+		depmod = modutils.get_depend_checker(modname2)
+		if depmod and depmod:check_depend(item1) then
 			return true
 		end
 	else
