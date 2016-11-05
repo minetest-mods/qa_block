@@ -29,18 +29,13 @@ end
 -- QA-Block functionality - list checks
 -----------------------------------------------
 qa_block.get_checks_list = function()
-	local ls
+	local files
 	local out = {}
-	if os.getenv('HOME')~=nil then
-		ls = io.popen('ls -a "'..thismodpath..'/checks/"') -- linux/mac native "ls -a"
-	else
-		ls = io.popen('dir "'..thismodpath..'\\checks\\*.*" /b') --windows native "dir /b"
-	end
-	for filename in ls:lines() do
-		if filename ~= "." and filename ~= ".." then
-			local outname, _ext = filename:match("(.*)(.lua)$")
-			table.insert(out, outname)
-		end
+	files = minetest.get_dir_list(filepath, false)
+	for f=1, #files do
+		local filename = files[f]
+		local outname, _ext = filename:match("(.*)(.lua)$")
+		table.insert(out, outname)
 	end
 
 	table.sort(out,function(a,b) return a<b end)
