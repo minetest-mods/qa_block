@@ -82,6 +82,13 @@ local second_blacklist = {
 	INIT = true,
 	DIR_DELIM = true,
 	PLATFORM = true,
+
+-- minetest_game
+	LIGHT_MAX = true,
+	LAVA_VISC = true,
+	vector = true,
+	WATER_VISC = true,
+	WATER_ALPHA = true,
 }
 
 
