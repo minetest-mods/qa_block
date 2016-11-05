@@ -38,12 +38,12 @@ local function dependency_exists(item1, item2)
 			return false --there should not be a redefinition in same module
 		end
 		depmod = modutils.get_depend_checker(modname1)
-		if depmod and depmod:check_depend(item2) then
+		if depmod and depmod:check_depend(modname2) then
 			return true
 		end
 
 		depmod = modutils.get_depend_checker(modname2)
-		if depmod and depmod:check_depend(item1) then
+		if depmod and depmod:check_depend(modname1) then
 			return true
 		end
 	else
