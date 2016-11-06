@@ -65,9 +65,9 @@ end
 -----------------------------------------------
 -- QA-Block functionality - execute a module
 -----------------------------------------------
-qa_block.do_module = function(module)
+qa_block.do_module = function(check)
 	print("QA checks started.")
-	local file = filepath..module..".lua"
+	local file = filepath..check..".lua"
 
 	local f=io.open(file,"r")
 	if not f then
@@ -91,6 +91,21 @@ qa_block.do_module = function(module)
 	end
 	print("QA checks finished.")
 
+end
+
+
+function qa_block.get_info(check)
+	local file = filepath..check..".lua"
+	local f=io.open(file,"r")
+	if not f then
+		return ""
+	end
+	local content = f:read("*all")
+	if not content then
+		return ""
+	else
+		return minetest.formspec_escape(content)
+	end
 end
 
 -----------------------------------------------

@@ -789,6 +789,9 @@ smartfs.element("list",{
 		end
 		table.remove(self.data.items,idx)
 	end,
+	clearItems = function(self)
+		self.data.items = {}
+	end,
 	getItem = function(self,idx)
 		if not self.data.items then
 			self.data.items = {}
