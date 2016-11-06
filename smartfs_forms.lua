@@ -20,7 +20,7 @@ end
 
 
 qa_block.fs = smartfs.create("qa_block:block", function(state)
-	state:size(10,7)
+	state:size(13,7.25)
 	state:label(0,0,"header","Please select a mod check which you want to perform.")
 	if state.location.type == "nodemeta" then
 		state:label(0,0.5,"header2", "Node position: ".. minetest.pos_to_string(state.location.pos))
@@ -29,10 +29,10 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 	end
 
 -- Text area for the info
-	local textarea = state:textarea(4.5,1,5.75,6.25,"textarea","Source")
+	local textarea = state:textarea(5.0,1,8,6.25,"textarea","Source")
 
 -- Listbox
-	local listbox = state:listbox(0,1,4,5.25,"fileslist")
+	local listbox = state:listbox(0,1,4.5,5.5,"fileslist")
 	update_fileslist(listbox)
 
 	listbox:onClick(function(self, state, index)
@@ -45,19 +45,19 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 	end)
 
 -- Run Button 
-	local runbutton = state:button(8,6.5,2,0.5,"Run","Run")
+	local runbutton = state:button(10,7,2,0.5,"Run","Run")
 	runbutton:onClick(function(self)
 		qa_block.do_source(textarea:getText())
 	end)
 
 
 -- Refersh Button
-	local refreshbutton = state:button(0,6.5,2,0.5,"refresh","Refresh")
+	local refreshbutton = state:button(0,7,2,0.5,"refresh","Refresh")
 	refreshbutton:onClick(function(self)
 		fileslist = qa_block.get_checks_list()
 		update_fileslist(listbox)
 	end)
 
-	state:button(2,6.5,2,0.5,"Close","Close", true)
+	state:button(2,7,2,0.5,"Close","Close", true)
 	return true
 end)

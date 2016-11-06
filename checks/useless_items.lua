@@ -1,5 +1,7 @@
--- Lists all items which are probably useless (not a node, not a weapon, not a mining tool, not used in any crafting recipe).
--- This checker is not perfect and tends to have a couple of false-positives.
+-- Lists all items which are probably useless
+
+--[[not a node, not a weapon, not a mining tool, not used in any crafting recipe.
+This checker is not perfect and tends to have a couple of false-positives.]]
 
 local items_in_craft = {}
 for k,v in pairs(minetest.registered_items) do

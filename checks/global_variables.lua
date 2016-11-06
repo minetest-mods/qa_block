@@ -1,9 +1,14 @@
+-- List suspicious global variables
+
+--[[ most buildins and known needed globals are blacklisted to not spam
+the output. The second blacklist are maybe-known bugs in released
+minetest or minetest_game. You can disable the second blacklist if you
+need to check the core functionality ]]
+
 local enable_second_blacklist = true
 
-
--- blacklist really needed
-local blacklist = {
 -- Lua needed things https://www.lua.org/manual/5.1/
+local blacklist = {
 	_G = true,
 	_VERSION = true,
 	assert = true,
@@ -113,6 +118,8 @@ for name, val in pairs(_G) do
 			else
 				print(name .. ": type \""..t.."\", long value")
 			end
+		elseif t == "function" then
+			print(name .. ": type \""..t.."\",.. source: "..debug.getinfo(val).source)
 		else
 			print(name .. ": type \""..t.."\"")
 		end

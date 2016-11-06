@@ -1,4 +1,5 @@
 -- Lists all items without description.
+
 -- Setting the description is optional, but recommended.
 
 for name, def in pairs(minetest.registered_items) do

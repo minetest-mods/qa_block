@@ -1,6 +1,15 @@
--- parameters
+-- Find duplicate crafting recipes
+
+-- resolve groups in recipes during comparing.
+-- If enabled the partially overlaps will be found
 local enable_groupcheck = false
+
+-- In case the there is a dependency between the mods of overlapped
+-- items there is a asumption the overlap is a wanted redefinition.
+-- The overlap is not reported in this case
 local enable_dependency_check = true
+
+-- print items without recipe in addition
 local print_no_recipe = false
 -------------
 

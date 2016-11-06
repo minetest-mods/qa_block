@@ -1,4 +1,7 @@
--- Lists all items which seem to be unobtainable by normal means (not dropped or crafted by anything).
+-- Lists items which seem to be unobtainable
+
+--[[ unobtainable by normal means like not dropped or crafted by anything. ]]
+
 local items = {}
 for item, _ in pairs(minetest.registered_items) do
 	if item ~= "unknown" and item ~= "ignore" and item ~= "air" and item ~= "" then
