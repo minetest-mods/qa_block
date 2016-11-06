@@ -50,13 +50,14 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 		qa_block.do_source(textarea:getText())
 	end)
 
-
--- Refersh Button
-	local refreshbutton = state:button(0,7,2,0.5,"refresh","Refresh")
-	refreshbutton:onClick(function(self)
-		fileslist = qa_block.get_checks_list()
-		update_fileslist(listbox)
-	end)
+	if not qa_block.restricted_mode then
+	-- Refersh Button
+		local refreshbutton = state:button(0,7,2,0.5,"refresh","Refresh")
+		refreshbutton:onClick(function(self)
+			fileslist = qa_block.get_checks_list()
+			update_fileslist(listbox)
+		end)
+	end
 
 	state:button(2,7,2,0.5,"Close","Close", true)
 	return true
