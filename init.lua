@@ -28,8 +28,10 @@ end
 -----------------------------------------------
 -- Get insecure environment
 -----------------------------------------------
+local ie_init
 local ie, req_ie = _G, minetest.request_insecure_environment
 if req_ie then ie = req_ie() end
+if ie then ie_init = ie else ie_init = _G end
 
 -----------------------------------------------
 -- QA-Block functionality - list checks
@@ -38,7 +40,7 @@ qa_block.get_checks_list = function()
 	if not qa_block.restricted_mode then
 		local out = {}
 		local files
-		files = ie.minetest.get_dir_list(filepath, false)
+		files = ie_init.minetest.get_dir_list(filepath, false)
 		for f=1, #files do
 			local filename = files[f]
 			local outname, _ext = filename:match("(.*)(.lua)$")
@@ -76,7 +78,7 @@ function qa_block.get_source(check)
 
 	if not qa_block.restricted_mode then
 		local file = filepath..check..".lua"
-		local f=ie.io.open(file,"r")
+		local f=ie_init.io.open(file,"r")
 		if not f then
 			return ""
 		end
@@ -99,12 +101,12 @@ function qa_block.do_source(source)
 	local compiled
 	local executed
 	local err
-	local compiled, err = ie.loadstring(source)
+	local compiled, err = ie_init.loadstring(source)
 	if not compiled then
 		print("Syntax error in QA Block check module")
 		print(err)
 	else
-		executed, err = ie.pcall(compiled)
+		executed, err = ie_init.pcall(compiled)
 		if not executed then
 			print("Runtime error in QA Block check module!")
 			print(err)
