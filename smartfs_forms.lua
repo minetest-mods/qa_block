@@ -57,8 +57,10 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 			fileslist = qa_block.get_checks_list()
 			update_fileslist(listbox)
 		end)
+	else
+		state:label(0,7,"restricted","not trusted fallback mode")
 	end
 
-	state:button(2,7,2,0.5,"Close","Close", true)
+	state:button(5,7,2,0.5,"Close","Close", true)
 	return true
 end)
