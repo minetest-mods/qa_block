@@ -598,7 +598,7 @@ smartfs.element("field",{
 				";"..
 				self.data.label..
 				";"..
-				self.data.value..
+				minetest.formspec_escape(self.data.value)..
 				"]"
 		elseif self.data.pwd then
 			return "pwdfield["..

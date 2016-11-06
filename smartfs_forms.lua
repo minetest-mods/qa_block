@@ -29,39 +29,35 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 	end
 
 -- Text area for the info
-	local textarea = state:textarea(5.5,1,4.5,6.25,"textarea","Source")
+	local textarea = state:textarea(4.5,1,5.75,6.25,"textarea","Source")
 
 -- Listbox
-	local listbox = state:listbox(0,1,5,5.25,"fileslist")
+	local listbox = state:listbox(0,1,4,5.25,"fileslist")
 	update_fileslist(listbox)
 
-	listbox:onClick(function(self,state, index)
-		textarea:setText(qa_block.get_info(self:getItem(index)))
+	listbox:onClick(function(self, state, index)
+		textarea:setText(qa_block.get_source(self:getItem(index)))
 	end)
 
 	listbox:onDoubleClick(function(self,state, index)
+		textarea:setText(qa_block.get_source(self:getItem(index)))
 		qa_block.do_module(self:getItem(index))
 	end)
 
 -- Run Button 
-	local runbutton = state:button(0,6.5,2,0.5,"Run","Run")
+	local runbutton = state:button(8,6.5,2,0.5,"Run","Run")
 	runbutton:onClick(function(self)
-		local check = listbox:getSelectedItem() 
-		if check then
-			qa_block.do_module(check)
-		else
-			print("Error: No check module selected.")
-		end
+		qa_block.do_source(textarea:getText())
 	end)
 
 
 -- Refersh Button
-	local refreshbutton = state:button(3,6.5,2,0.5,"refresh","Refresh")
+	local refreshbutton = state:button(0,6.5,2,0.5,"refresh","Refresh")
 	refreshbutton:onClick(function(self)
 		fileslist = qa_block.get_checks_list()
 		update_fileslist(listbox)
 	end)
 
-	state:button(7,6.5,2,0.5,"Close","Close", true)
+	state:button(2,6.5,2,0.5,"Close","Close", true)
 	return true
 end)

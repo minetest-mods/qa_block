@@ -46,7 +46,6 @@ end
 -----------------------------------------------
 -- QA-Block functionality - redefine print - reroute output to chat window
 -----------------------------------------------
-
 if print_to_chat then
 	local old_print = print
 	print = function(...)
@@ -93,8 +92,10 @@ qa_block.do_module = function(check)
 
 end
 
-
-function qa_block.get_info(check)
+-----------------------------------------------
+-- QA-Block functionality - get the source of a module
+-----------------------------------------------
+function qa_block.get_source(check)
 	local file = filepath..check..".lua"
 	local f=io.open(file,"r")
 	if not f then
@@ -104,9 +105,32 @@ function qa_block.get_info(check)
 	if not content then
 		return ""
 	else
-		return minetest.formspec_escape(content)
+		return content
 	end
 end
+
+-----------------------------------------------
+-- QA-Block functionality - get the source of a module
+-----------------------------------------------
+function qa_block.do_source(source)
+	print("modified QA checks started.")
+	local compiled
+	local executed
+	local err
+	local compiled, err = loadstring(source)
+	if not compiled then
+		print("Syntax error in QA Block check module")
+		print(err)
+	else
+		executed, err = pcall(compiled)
+		if not executed then
+			print("Runtime error in QA Block check module!")
+			print(err)
+		end
+	end
+	print("QA checks finished.")
+end
+
 
 -----------------------------------------------
 -- Chat command to start checks
