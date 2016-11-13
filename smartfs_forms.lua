@@ -1,8 +1,5 @@
--- the smartfs.lua is loaded
-
---- temporary provide smartfs as builtin, till the needed changes are upstream
+-- the smartfs.lua is loaded from init.lua
 local smartfs = qa_block.smartfs
---- temporary end
 
 local fileslist
 

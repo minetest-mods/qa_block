@@ -14,11 +14,10 @@ local filepath = modpath.."/checks/"
 qa_block = {} -- needed as envroot in tools
 local thismodpath = minetest.get_modpath(minetest.get_current_modname())
 
---- temporary provide smartfs as builtin, till the needed changes are upstream
-dofile(thismodpath.."/smartfs.lua") --3rd party smarfs
-local smartfs = qa_block.smartfs
+--- use provided smartfs version instead of mod, (temporary till the needed changes are upstream?)
+local smartfs = dofile(thismodpath.."/smartfs.lua")
+qa_block.smartfs = smartfs
 local smartfsmod = "qa_block"
---- temporary end
 
 --local smartfsmod = minetest.get_modpath("smartfs")
 if smartfsmod then --smartfs is optional
@@ -190,7 +189,7 @@ minetest.register_node("qa_block:block", {
 	groups = {cracky = 3, dig_immediate = 2 },
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		if smartfsmod then
-			qa_block.fs:attach_nodemeta(pos, placer) --(:form, nodepos, params, placer)
+			qa_block.fs:attach_to_node(pos, placer) --(:form, nodepos, params, placer)
 		else --not a smartfs mod selection dialog. Just run the default one
 			qa_block.do_module(defaultmodule)
 			minetest:remove_node(pos)
