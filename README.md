@@ -14,6 +14,7 @@ This is a developer helper mod, allow run any lua code for testing reason. The m
 - type code and run them
 
 ![Screenshot](screenshot.png)
+https://forum.minetest.net/viewtopic.php?f=11&t=15759
 
 # Dependencies
 - smartfs - GUI for check selection is implemented using smartfs - currently a provided version is used so there is no dependency
