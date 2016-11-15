@@ -1,8 +1,4 @@
--- the smartfs.lua is loaded from init.lua
-local smartfs = qa_block.smartfs
-
 local fileslist
-
 local function update_fileslist(listbox)
 	if not fileslist then -- initial update the fileslist
 		fileslist = qa_block.get_checks_list()
@@ -14,7 +10,6 @@ local function update_fileslist(listbox)
 		end
 	end
 end
-
 
 qa_block.fs = smartfs.create("qa_block:block", function(state)
 	state:size(13,7.25)
@@ -44,7 +39,7 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 -- Run Button 
 	local runbutton = state:button(10,7,2,0.5,"Run","Run")
 	runbutton:onClick(function(self)
-		qa_block.do_source(textarea:getText())
+		qa_block.do_source(textarea:getText(), "from textarea")
 	end)
 
 	if not qa_block.restricted_mode then

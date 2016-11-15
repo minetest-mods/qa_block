@@ -17,7 +17,7 @@ This is a developer helper mod, allow run any lua code for testing reason. The m
 https://forum.minetest.net/viewtopic.php?f=11&t=15759
 
 # Dependencies
-- smartfs - GUI for check selection is implemented using smartfs - currently a provided version is used so there is no dependency
+- smartfs - GUI for check selection and manipulation. Optional, but without smartfs there is limited functionality available
 
 # Provided check modules
 - empty - Empty file for your own checks
@@ -34,16 +34,18 @@ https://forum.minetest.net/viewtopic.php?f=11&t=15759
 # How to use:
 add the mod to the game you like to test
 
-## Using chat command /qa_block
-- qa ls - list all available check modules
-- qa sel - display and run check using the selection dialog (smartfs only)
-- qa checkname - run check
-- qa - run default module (hardcoded to "same_recipe")
+## Using chat command /qa
+- /qa help - print available chat commands
+- /qa ls - list all available check modules
+- /qa set checkname - set default check
+- /qa ui - display and run check using the selection dialog (smartfs only)
+- /qa checkname - run check
+- /qa - run default check
 
 ## Using the block
 1. get the QA-Block from creative inventory
 2. place the block somewhere
-3a - without smartfs - wait till the block disappears
+3a - without smartfs - wait till the default check is finished and the block disappears
 3b - with smartfs - start the check using selection dialog
 
 In all cases - check the debug.txt for test results

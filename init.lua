@@ -1,27 +1,25 @@
 -----------------------------------------------
 -- Some hardcoded settings and constants
 -----------------------------------------------
-local defaultmodule = "same_recipe"
+local defaultmodule = "empty"
 local print_to_chat = true
 
--- constants
 local modpath = minetest.get_modpath("qa_block")
 local filepath = modpath.."/checks/"
 
 -----------------------------------------------
 -- Load external libs and other files
 -----------------------------------------------
-qa_block = {} -- needed as envroot in tools
+qa_block = {}
 local thismodpath = minetest.get_modpath(minetest.get_current_modname())
 
---- use provided smartfs version instead of mod, (temporary till the needed changes are upstream?)
-local smartfs = dofile(thismodpath.."/smartfs.lua")
-qa_block.smartfs = smartfs
-local smartfsmod = "qa_block"
-
---local smartfsmod = minetest.get_modpath("smartfs")
-if smartfsmod then --smartfs is optional
-	dofile(thismodpath.."/smartfs_forms.lua") --qa_block forms
+local smartfs_enabled = false
+if minetest.get_modpath("smartfs") and
+		smartfs.nodemeta_on_receive_fields then -- nodemeta handling implemented, right version.
+	dofile(thismodpath.."/smartfs_forms.lua")
+	smartfs_enabled = true
+else
+	print("WARNING: qa_block without (compatible) smartfs is limited functionality")
 end
 
 -----------------------------------------------
@@ -52,7 +50,6 @@ qa_block.get_checks_list = function()
 	end
 end
 
-
 -----------------------------------------------
 -- QA-Block functionality - redefine print - reroute output to chat window
 -----------------------------------------------
@@ -74,7 +71,6 @@ end
 -- QA-Block functionality - get the source of a module
 -----------------------------------------------
 function qa_block.get_source(check)
-
 	if not qa_block.restricted_mode then
 		local file = filepath..check..".lua"
 		local f=ie_init.io.open(file,"r")
@@ -95,8 +91,8 @@ end
 -----------------------------------------------
 -- QA-Block functionality - get the source of a module
 -----------------------------------------------
-function qa_block.do_source(source)
-	print("QA checks started.")
+function qa_block.do_source(source, checkname)
+	print("QA check "..checkname.." started.")
 	local compiled
 	local executed
 	local err
@@ -111,9 +107,8 @@ function qa_block.do_source(source)
 			print(err)
 		end
 	end
-	print("QA checks finished.")
+	print("QA check "..checkname.." finished.")
 end
-
 
 -----------------------------------------------
 -- QA-Block functionality - execute a module
@@ -121,7 +116,7 @@ end
 qa_block.do_module = function(check)
 	local source = qa_block.get_source(check)
 	if source then
-		qa_block.do_source(source)
+		qa_block.do_source(source, check)
 	end
 end
 
@@ -142,17 +137,16 @@ else
 	print("qa_block INFO: entering trusted or not restricted environment ;)")
 end
 
-
 -----------------------------------------------
 -- Chat command to start checks
 -----------------------------------------------
 local command_params, command_description
-if smartfsmod then
-	command_params = "[<check_module> | ls | sel ]"
-	command_description = "Perform a mod Quality Assurance check. ls = list available check modules; sel = Open form"
+if smartfs_enabled then
+	command_params = "[<check_module> | help | ls | set <check_module> | ui ]"
+	command_description = "Perform a mod Quality Assurance check. see /qa help for details"
 else
-	command_params = "[<check_module> | ls ]"
-	command_description = "Perform a mod Quality Assurance check. ls = list available check modules"
+	command_params = "[<check_module> | help | ls | set <check_module> ]"
+	command_description = "Perform a mod Quality Assurance check. see /qa help for details"
 end
 
 minetest.register_chatcommand("qa", {
@@ -160,15 +154,38 @@ minetest.register_chatcommand("qa", {
 	params = command_params,
 	privs = {server = true},
 	func = function(name, param)
-		if param == "ls" then
+		if param == "help" then
+		print([[
+- /qa help - print available chat commands
+- /qa ls - list all available check modules
+- /qa set checkname - set default check
+- /qa ui - show selection dialog (smartfs only)
+- /qa checkname - run check
+- /qa - run default check
+		]])
+		elseif param == "ls" then
 			for idx, file in ipairs(qa_block.get_checks_list()) do
 				print(file)
 			end
-		elseif param == "sel" then
-			if smartfsmod then
+		elseif param == "ui" then
+			if smartfs_enabled then
 				qa_block.fs:show(name)
 			else
 				print("selection screen not supported without smartfs")
+			end
+		elseif string.sub(param, 1, 3) == "set" then
+			local isvalid = false
+			local option = string.sub(param, 5)
+			for idx, file in ipairs(qa_block.get_checks_list()) do
+				if file == option then
+					isvalid = true
+				end
+			end
+			if isvalid then
+				defaultmodule = option
+				print("check "..tostring(option).." selected")
+			else
+				print("check "..tostring(option).." is not valid")
 			end
 		elseif param and param ~= "" then
 			qa_block.do_module(param)
@@ -179,7 +196,6 @@ minetest.register_chatcommand("qa", {
 	end
 })
 
-
 -----------------------------------------------
 -- Block node definition - with optional smartfs integration
 -----------------------------------------------
@@ -188,15 +204,15 @@ minetest.register_node("qa_block:block", {
 	tiles = {"qa_block.png"},
 	groups = {cracky = 3, dig_immediate = 2 },
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
-		if smartfsmod then
+		if smartfs_enabled then
 			qa_block.fs:attach_to_node(pos, placer) --(:form, nodepos, params, placer)
 		else --not a smartfs mod selection dialog. Just run the default one
 			qa_block.do_module(defaultmodule)
-			minetest:remove_node(pos)
+			minetest.remove_node(pos)
 		end
 	end,
 	on_receive_fields = function(pos, formname, fields, sender)
-		if smartfsmod then
+		if smartfs_enabled then
 			smartfs.nodemeta_on_receive_fields(pos, formname, fields, sender)
 		end
 	end
