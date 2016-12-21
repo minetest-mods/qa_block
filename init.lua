@@ -54,17 +54,20 @@ end
 -- QA-Block functionality - redefine print - reroute output to chat window
 -----------------------------------------------
 if print_to_chat then
-	local old_print = print
-	print = function(...)
-		local outsting = ""
-		local out
-		local x
-		for x, out in ipairs(arg) do
-			outsting = (outsting..tostring(out)..'\t')
+	local function do_print_redefinition()
+		local old_print = print
+		print = function(...)
+			local outsting = ""
+			local out
+			local x
+			for x, out in ipairs(arg) do
+				outsting = (outsting..tostring(out)..'\t')
+			end
+			old_print(outsting)
+			minetest.chat_send_all(outsting)
 		end
-		old_print(outsting)
-		minetest.chat_send_all(outsting)
 	end
+	minetest.after(0, do_print_redefinition)
 end
 
 -----------------------------------------------
