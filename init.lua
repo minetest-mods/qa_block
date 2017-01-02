@@ -23,31 +23,19 @@ else
 end
 
 -----------------------------------------------
--- Get insecure environment
------------------------------------------------
-local ie_init
-local ie, req_ie = _G, minetest.request_insecure_environment
-if req_ie then ie = req_ie() end
-if ie then ie_init = ie else ie_init = _G end
-
------------------------------------------------
 -- QA-Block functionality - list checks
 -----------------------------------------------
 qa_block.get_checks_list = function()
-	if not qa_block.restricted_mode then
-		local out = {}
-		local files
-		files = ie_init.minetest.get_dir_list(filepath, false)
-		for f=1, #files do
-			local filename = files[f]
-			local outname, _ext = filename:match("(.*)(.lua)$")
-			table.insert(out, outname)
-		end
-		table.sort(out,function(a,b) return a<b end)
-		return out
-	else
-		return qa_block.restricted_cache_checks
+	local out = {}
+	local files
+	files = minetest.get_dir_list(filepath, false)
+	for f=1, #files do
+		local filename = files[f]
+		local outname, _ext = filename:match("(.*)(.lua)$")
+		table.insert(out, outname)
 	end
+	table.sort(out,function(a,b) return a<b end)
+	return out
 end
 
 -----------------------------------------------
@@ -74,20 +62,16 @@ end
 -- QA-Block functionality - get the source of a module
 -----------------------------------------------
 function qa_block.get_source(check)
-	if not qa_block.restricted_mode then
-		local file = filepath..check..".lua"
-		local f=ie_init.io.open(file,"r")
-		if not f then
-			return ""
-		end
-		local content = f:read("*all")
-		if not content then
-			return ""
-		else
-			return content
-		end
+	local file = filepath..check..".lua"
+	local f=io.open(file,"r")
+	if not f then
+		return ""
+	end
+	local content = f:read("*all")
+	if not content then
+		return ""
 	else
-		return qa_block.restricted_cache_source[check]
+		return content
 	end
 end
 
@@ -99,12 +83,12 @@ function qa_block.do_source(source, checkname)
 	local compiled
 	local executed
 	local err
-	local compiled, err = ie_init.loadstring(source)
+	local compiled, err = loadstring(source)
 	if not compiled then
 		print("Syntax error in QA Block check module")
 		print(err)
 	else
-		executed, err = ie_init.pcall(compiled)
+		executed, err = pcall(compiled)
 		if not executed then
 			print("Runtime error in QA Block check module!")
 			print(err)
@@ -121,23 +105,6 @@ qa_block.do_module = function(check)
 	if source then
 		qa_block.do_source(source, check)
 	end
-end
-
------------------------------------------------
--- Minetest restricted mode in case of security enabled without trust qa_block
------------------------------------------------
-if not ie then
-	print("WARNING: qa_block is not trusted. Starting in restricted compatibility mode")
-	qa_block.restricted_cache_checks = qa_block.get_checks_list()
-
-	qa_block.restricted_cache_source = {}
-	for idx, check in ipairs(qa_block.restricted_cache_checks) do
-		qa_block.restricted_cache_source[check] = qa_block.get_source(check)
-	end
-
-	qa_block.restricted_mode = true --enable the restriction
-else
-	print("qa_block INFO: entering trusted or not restricted environment ;)")
 end
 
 -----------------------------------------------

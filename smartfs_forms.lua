@@ -20,10 +20,10 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 		state:label(0,0.5,"header2", "Player: "..state.location.player)
 	end
 
--- Text area for the info
+	-- Text area for the info
 	local textarea = state:textarea(5.0,1,8,6.25,"textarea","Source")
 
--- Listbox
+	-- Listbox
 	local listbox = state:listbox(0,1,4.5,5.5,"fileslist")
 	update_fileslist(listbox)
 
@@ -36,22 +36,18 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 		qa_block.do_module(self:getItem(index))
 	end)
 
--- Run Button 
+	-- Run Button
 	local runbutton = state:button(10,7,2,0.5,"Run","Run")
 	runbutton:onClick(function(self)
 		qa_block.do_source(textarea:getText(), "from textarea")
 	end)
 
-	if not qa_block.restricted_mode then
 	-- Refersh Button
-		local refreshbutton = state:button(0,7,2,0.5,"refresh","Refresh")
-		refreshbutton:onClick(function(self)
-			fileslist = qa_block.get_checks_list()
-			update_fileslist(listbox)
-		end)
-	else
-		state:label(0,7,"restricted","not trusted fallback mode")
-	end
+	local refreshbutton = state:button(0,7,2,0.5,"refresh","Refresh")
+	refreshbutton:onClick(function(self)
+		fileslist = qa_block.get_checks_list()
+		update_fileslist(listbox)
+	end)
 
 	state:button(5,7,2,0.5,"Close","Close", true)
 	return true
