@@ -1,4 +1,10 @@
 local fileslist
+local smartfs = qa_block.smartfs --use provided
+
+
+-----------------------------------------------
+-- Scripts / Checks tab view
+-----------------------------------------------
 local function update_fileslist(listbox)
 	if not fileslist then -- initial update the fileslist
 		fileslist = qa_block.get_checks_list()
@@ -11,7 +17,7 @@ local function update_fileslist(listbox)
 	end
 end
 
-qa_block.fs = smartfs.create("qa_block:block", function(state)
+local function _check_selection_dialog(state)
 	state:size(13,7.25)
 	state:label(0,0,"header","Please select a mod check which you want to perform.")
 	if state.location.type == "nodemeta" then
@@ -51,4 +57,179 @@ qa_block.fs = smartfs.create("qa_block:block", function(state)
 
 	state:button(5,7,2,0.5,"Close","Close", true)
 	return true
-end)
+end
+
+-----------------------------------------------
+-- Environment explorer
+-----------------------------------------------
+
+local function get_explorer_obj(state)
+
+	local function new_explorer()
+		local xp = {
+			stack = {
+				[1] = {
+					label = "Root (_G)",
+					ref = _G,
+					parent = nil
+				},
+				list = {}
+			},
+		}
+		return xp
+	end
+
+	-- get session state reference
+	if not state._explorer then
+		state._explorer = new_explorer()
+	end
+	return state._explorer
+end
+
+
+local function _explore_dialog(state)
+	state:size(13,7.25)
+	state:label(0,0,"header","Explore the Lua environment")
+	local lb_stack = state:listbox(0,0.5,5,7,"stack")
+	local lb_current = state:listbox(5.5,0.5,7,6.25,"current")
+	local btn_dump = state:button(5.5,7,2,0.5,"dump", "Dump")
+	local ck_funchide = state:checkbox(9, 6.75, "funchide", "Hide functions")
+
+	local function update_current(lb_current, index, explorer)
+		local stackentry = explorer.stack[index]
+		lb_current:clearItems()
+		explorer.list = {}
+		if stackentry then
+			for name, val in pairs(stackentry.ref) do
+				local entry
+				local sval
+				local t = type(val)
+				if t == "number" or t == "string" or t == "boolean" then
+					local sval = dump(val)
+					if string.len(sval) < 64 then
+						entry = name .. ": type \""..t.."\", value: " .. sval
+					else
+						entry = name .. ": type \""..t.."\", long value"
+					end
+				elseif t == "function" then
+					entry = name .. ": type \""..t.."\",.. source: "..debug.getinfo(val).source
+				else
+					entry = name .. ": type \""..t.."\""
+				end
+				if not (ck_funchide:getValue() == true and t == "function") then
+					local idx = lb_current:addItem(minetest.formspec_escape(entry))
+					explorer.list[idx] = {
+						label = name,
+						ref = val,
+						parent = stackentry
+					}
+				end
+			end
+		end
+	end
+
+	local explorer = get_explorer_obj(state)
+	lb_stack:clearItems()
+	for _, stacknode in ipairs(explorer.stack) do
+		local idx = lb_stack:addItem(minetest.formspec_escape(stacknode.label))
+		stacknode.idx = idx
+	end
+	lb_stack:onClick(function(self, state, index)
+		update_current(lb_current, index, explorer)
+	end)
+
+	ck_funchide:onToggle(function(self, state)
+		update_current(lb_current, lb_stack:getSelected() , explorer)
+	end)
+
+	lb_current:onDoubleClick(function(self, state, index)
+		if not explorer.list[index] then
+			return
+		end
+		if type(explorer.list[index].ref) == "table" then
+			local nav_to = explorer.list[index]
+			-- cleanup stack before add the item
+			for i = #explorer.stack, 1, -1 do
+				if nav_to.parent.idx < explorer.stack[i].idx then
+					lb_stack:removeItem(i)
+					explorer.stack[i] = nil
+				else
+					break
+				end
+			end
+			-- add selected to stack and select on stack
+			local idx = lb_stack:addItem(minetest.formspec_escape(nav_to.label))
+			lb_stack:setSelected(idx)
+			explorer.stack[idx] = nav_to
+			nav_to.idx = idx
+			update_current(lb_current, idx, explorer)
+		end
+	end)
+
+	btn_dump:onClick(function(state)
+		local index = lb_current:getSelected()
+		if index and explorer.list[index] then
+			print(dump(explorer.list[index].ref))
+		end
+	end)
+end
+
+
+-----------------------------------------------
+-- Root view / tabs
+-----------------------------------------------
+local function _root_dialog(state)
+	--set screen size
+	state:size(14,10)
+	-- tabbed view controller
+	local tab_controller = {
+		_tabs = {},
+		active_name = nil,
+		set_active = function(self, tabname)
+			for name, def in pairs(self._tabs) do
+				if name == tabname then
+					def.button:setBackground("halo.png")
+					def.view:setIsHidden(false)
+				else
+					def.button:setBackground(nil)
+					def.view:setIsHidden(true)
+				end
+			end
+			self.active_name = tabname
+		end,
+		tab_add = function(self, name, def)
+			def.viewstate:size(14,8) --size of tab view
+			self._tabs[name] = def
+		end,
+		get_active_name = function(self)
+			return self.active_name
+		end,
+	}
+	local tab1 = {}
+	tab1.button = state:button(0,0,2,1,"tab1_btn","Checks")
+	tab1.button:onClick(function(self)
+		tab_controller:set_active("tab1")
+	end)
+	tab1.view = state:view(0,1,"tab1_view")
+	tab1.viewstate = tab1.view:getViewState()
+	tab1.viewstate:loadTemplate(_check_selection_dialog)
+	tab_controller:tab_add("tab1", tab1)
+
+	local tab2 = {}
+	tab2.button = state:button(2,0,2,1,"tab2_btn","Globals")
+	tab2.button:onClick(function(self)
+		tab_controller:set_active("tab2")
+	end)
+	tab2.view = state:view(0,1,"tab2_view")
+	tab2.viewstate = tab2.view:getViewState()
+	tab2.viewstate:loadTemplate(_explore_dialog)
+	tab_controller:tab_add("tab2", tab2)
+	if not tab_controller:get_active_name() then
+		tab_controller:set_active("tab1")
+	end
+end
+
+
+----------------------------------
+qa_block.fs = smartfs.create("qa_block:block", _root_dialog)
+--------------------------

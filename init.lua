@@ -13,6 +13,7 @@ local filepath = modpath.."/checks/"
 qa_block = {}
 local thismodpath = minetest.get_modpath(minetest.get_current_modname())
 
+--[[ --temporary buildin usage (again)
 local smartfs_enabled = false
 if minetest.get_modpath("smartfs") and
 		smartfs.nodemeta_on_receive_fields then -- nodemeta handling implemented, right version.
@@ -21,6 +22,11 @@ if minetest.get_modpath("smartfs") and
 else
 	print("WARNING: qa_block without (compatible) smartfs is limited functionality")
 end
+]]
+local smartfs = dofile(thismodpath.."/smartfs.lua")
+qa_block.smartfs = smartfs
+dofile(thismodpath.."/smartfs_forms.lua")
+smartfs_enabled = true
 
 -----------------------------------------------
 -- QA-Block functionality - list checks
@@ -175,7 +181,7 @@ minetest.register_node("qa_block:block", {
 	groups = {cracky = 3, dig_immediate = 2 },
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		if smartfs_enabled then
-			qa_block.fs:attach_to_node(pos, placer) --(:form, nodepos, params, placer)
+			qa_block.fs:attach_to_node(pos)
 		else --not a smartfs mod selection dialog. Just run the default one
 			qa_block.do_module(defaultmodule)
 			minetest.remove_node(pos)
