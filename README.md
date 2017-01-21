@@ -4,6 +4,7 @@ QA Block to run checking scripts for beter quality assurance of code
 License GPL-V3: https://www.gnu.org/licenses/gpl-3.0.html
 
 This is a developer helper mod, allow run any lua code for testing reason. The mod can list and run lua-scripts placed in checks subfolder. some check scrips provided.
+The second part is able to display global lua-tables tree
 
 # Features
 - redirection of print() output to minetest chat. (can be disabled by changing code line "print_to_chat")
@@ -12,12 +13,17 @@ This is a developer helper mod, allow run any lua code for testing reason. The m
 - refresh and list the checks script list at runtime
 - edit the code before calling them
 - type code and run them
+- explore global variables/lua tables
 
-![Screenshot](screenshot.png)
+![Screenshot](screenshot_20170121_012152.png)
+![Screenshot](screenshot_20170121_011613.png)
+
 https://forum.minetest.net/viewtopic.php?f=11&t=15759
 
 # Dependencies
-- smartfs - GUI for check selection and manipulation. Optional, but without smartfs there is limited functionality available
+- none
+  - smartfs(provided) - GUI for check selection and manipulation. Optional, but without smartfs there is limited functionality 
+
 
 # Provided check modules
 - empty - Empty file for your own checks
@@ -38,7 +44,7 @@ add the mod to the game you like to test
 - /qa help - print available chat commands
 - /qa ls - list all available check modules
 - /qa set checkname - set default check
-- /qa ui - display and run check using the selection dialog (smartfs only)
+- /qa ui - display and run check using the selection dialog. Browse trough globals (smartfs only)
 - /qa checkname - run check
 - /qa - run default check
 
