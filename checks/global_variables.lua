@@ -50,6 +50,9 @@ local blacklist = {
 	string = true,
 	table = true,
 
+	-- undocumented / deprecated in Lua 5.1
+	newproxy = true,
+
 -- minetest related needed globals
 	minetest = true,
 	core = true,
@@ -78,7 +81,6 @@ local second_blacklist = {
 	nodeupdate = true,
 	check_attached_node = true,
 	drop_attached_node = true,
-	newproxy = true,
 	get_last_folder = true,
 	spawn_falling_node = true,
 	on_dignode = true,
