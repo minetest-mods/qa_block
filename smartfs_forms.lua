@@ -34,11 +34,11 @@ local function _check_selection_dialog(state)
 	update_fileslist(listbox)
 
 	listbox:onClick(function(self, state, index)
-		textarea:setText(qa_block.get_source(self:getItem(index)))
+		state:get("textarea"):setText(qa_block.get_source(self:getItem(index)))
 	end)
 
 	listbox:onDoubleClick(function(self,state, index)
-		textarea:setText(qa_block.get_source(self:getItem(index)))
+		state:get("textarea"):setText(qa_block.get_source(self:getItem(index)))
 		qa_block.do_module(self:getItem(index))
 	end)
 
@@ -52,7 +52,7 @@ local function _check_selection_dialog(state)
 	local refreshbutton = state:button(0,7,2,0.5,"refresh","Refresh")
 	refreshbutton:onClick(function(self)
 		fileslist = qa_block.get_checks_list()
-		update_fileslist(listbox)
+		update_fileslist(state:get("fileslist"))
 	end)
 
 	state:button(5,7,2,0.5,"Close","Close", true)
@@ -95,7 +95,10 @@ local function _explore_dialog(state)
 	local btn_dump = state:button(5.5,7,2,0.5,"dump", "Dump")
 	local ck_funchide = state:checkbox(9, 6.75, "funchide", "Hide functions")
 
-	local function update_current(lb_current, index, explorer)
+	local function update_current(state, index)
+		local lb_current = state:get("current")
+		local explorer = get_explorer_obj(state)
+		local ck_funchide = state:get("funchide")
 		local stackentry = explorer.stack[index]
 		lb_current:clearItems()
 		explorer.list = {}
@@ -135,14 +138,16 @@ local function _explore_dialog(state)
 		stacknode.idx = idx
 	end
 	lb_stack:onClick(function(self, state, index)
-		update_current(lb_current, index, explorer)
+		update_current(state, index)
 	end)
 
 	ck_funchide:onToggle(function(self, state)
-		update_current(lb_current, lb_stack:getSelected() , explorer)
+		update_current(state, state:get("stack"):getSelected())
 	end)
 
 	lb_current:onDoubleClick(function(self, state, index)
+		local explorer = get_explorer_obj(state)
+		local lb_stack = state:get("stack")
 		if not explorer.list[index] then
 			return
 		end
@@ -162,12 +167,13 @@ local function _explore_dialog(state)
 			lb_stack:setSelected(idx)
 			explorer.stack[idx] = nav_to
 			nav_to.idx = idx
-			update_current(lb_current, idx, explorer)
+			update_current(state, idx)
 		end
 	end)
 
-	btn_dump:onClick(function(state)
-		local index = lb_current:getSelected()
+	btn_dump:onClick(function(self, state)
+		local index = state:get("current"):getSelected()
+		local explorer = get_explorer_obj(state)
 		if index and explorer.list[index] then
 			print(dump(explorer.list[index].ref))
 		end
