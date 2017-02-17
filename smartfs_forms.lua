@@ -93,40 +93,51 @@ local function _explore_dialog(state)
 	local lb_stack = state:listbox(0,0.5,5,7,"stack")
 	local lb_current = state:listbox(5.5,0.5,7,6.25,"current")
 	local btn_dump = state:button(5.5,7,2,0.5,"dump", "Dump")
-	local ck_funchide = state:checkbox(9, 6.75, "funchide", "Hide functions")
+	local fld_search = state:field(8, 7.32, 2, 0.5, "search")
+	local btn_search = state:button(9.7,7,1,0.5,"search_btn", "Search")
+	local ck_funchide = state:checkbox(11, 6.75, "funchide", "Hide functions")
 
 	local function update_current(state, index)
 		local lb_current = state:get("current")
 		local explorer = get_explorer_obj(state)
 		local ck_funchide = state:get("funchide")
 		local stackentry = explorer.stack[index]
-		lb_current:clearItems()
+		local search = state:get("search"):getText()
 		explorer.list = {}
 		if stackentry then
 			for name, val in pairs(stackentry.ref) do
-				local entry
-				local sval
-				local t = type(val)
-				if t == "number" or t == "string" or t == "boolean" then
-					local sval = dump(val)
-					if string.len(sval) < 64 then
-						entry = name .. ": type \""..t.."\", value: " .. sval
+				if string.match(name, search) then
+					local entry
+					local sval
+					local t = type(val)
+					if t == "number" or t == "string" or t == "boolean" then
+						local sval = dump(val)
+						if string.len(sval) < 64 then
+							entry = name .. ": type \""..t.."\", value: " .. sval
+						else
+							entry = name .. ": type \""..t.."\", long value"
+						end
+					elseif t == "function" then
+						entry = name .. ": type \""..t.."\",.. source: "..debug.getinfo(val).source
 					else
-						entry = name .. ": type \""..t.."\", long value"
+						entry = name .. ": type \""..t.."\""
 					end
-				elseif t == "function" then
-					entry = name .. ": type \""..t.."\",.. source: "..debug.getinfo(val).source
-				else
-					entry = name .. ": type \""..t.."\""
+					if not (ck_funchide:getValue() == true and t == "function") then
+						table.insert(explorer.list, {
+							label = name,
+							ref = val,
+							parent = stackentry,
+							text = entry
+						})
+					end
 				end
-				if not (ck_funchide:getValue() == true and t == "function") then
-					local idx = lb_current:addItem(entry)
-					explorer.list[idx] = {
-						label = name,
-						ref = val,
-						parent = stackentry
-					}
-				end
+			end
+			table.sort(explorer.list, function(a,b)
+				return (a.label < b.label)
+			end)
+			lb_current:clearItems()
+			for _, stackentry in ipairs(explorer.list) do
+				lb_current:addItem(stackentry.text)
 			end
 		end
 	end
@@ -177,6 +188,10 @@ local function _explore_dialog(state)
 		if index and explorer.list[index] then
 			print(dump(explorer.list[index].ref))
 		end
+	end)
+
+	btn_search:onClick(function(self, state)
+		update_current(state, state:get("stack"):getSelected())
 	end)
 end
 
