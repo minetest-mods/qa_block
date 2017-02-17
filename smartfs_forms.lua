@@ -117,7 +117,7 @@ local function _explore_dialog(state)
 					entry = name .. ": type \""..t.."\""
 				end
 				if not (ck_funchide:getValue() == true and t == "function") then
-					local idx = lb_current:addItem(minetest.formspec_escape(entry))
+					local idx = lb_current:addItem(entry)
 					explorer.list[idx] = {
 						label = name,
 						ref = val,
@@ -131,7 +131,7 @@ local function _explore_dialog(state)
 	local explorer = get_explorer_obj(state)
 	lb_stack:clearItems()
 	for _, stacknode in ipairs(explorer.stack) do
-		local idx = lb_stack:addItem(minetest.formspec_escape(stacknode.label))
+		local idx = lb_stack:addItem(stacknode.label)
 		stacknode.idx = idx
 	end
 	lb_stack:onClick(function(self, state, index)
@@ -158,7 +158,7 @@ local function _explore_dialog(state)
 				end
 			end
 			-- add selected to stack and select on stack
-			local idx = lb_stack:addItem(minetest.formspec_escape(nav_to.label))
+			local idx = lb_stack:addItem(nav_to.label)
 			lb_stack:setSelected(idx)
 			explorer.stack[idx] = nav_to
 			nav_to.idx = idx
@@ -189,10 +189,10 @@ local function _root_dialog(state)
 			for name, def in pairs(self._tabs) do
 				if name == tabname then
 					def.button:setBackground("halo.png")
-					def.view:setIsHidden(false)
+					def.view:setVisible(true)
 				else
 					def.button:setBackground(nil)
-					def.view:setIsHidden(true)
+					def.view:setVisible(false)
 				end
 			end
 			self.active_name = tabname
@@ -210,9 +210,9 @@ local function _root_dialog(state)
 	tab1.button:onClick(function(self)
 		tab_controller:set_active("tab1")
 	end)
-	tab1.view = state:view(0,1,"tab1_view")
-	tab1.viewstate = tab1.view:getViewState()
-	tab1.viewstate:loadTemplate(_check_selection_dialog)
+	tab1.view = state:container(0,1,"tab1_view")
+	tab1.viewstate = tab1.view:getContainerState()
+	_check_selection_dialog(tab1.viewstate)
 	tab_controller:tab_add("tab1", tab1)
 
 	local tab2 = {}
@@ -220,9 +220,9 @@ local function _root_dialog(state)
 	tab2.button:onClick(function(self)
 		tab_controller:set_active("tab2")
 	end)
-	tab2.view = state:view(0,1,"tab2_view")
-	tab2.viewstate = tab2.view:getViewState()
-	tab2.viewstate:loadTemplate(_explore_dialog)
+	tab2.view = state:container(0,1,"tab2_view")
+	tab2.viewstate = tab2.view:getContainerState()
+	_explore_dialog(tab2.viewstate)
 	tab_controller:tab_add("tab2", tab2)
 	if not tab_controller:get_active_name() then
 		tab_controller:set_active("tab1")
