@@ -54,7 +54,7 @@ if print_to_chat then
 			local outsting = ""
 			local out
 			local x
-			for x, out in ipairs(arg) do
+			for x, out in ipairs({...}) do
 				outsting = (outsting..tostring(out)..'\t')
 			end
 			old_print(outsting)
