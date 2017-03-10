@@ -75,15 +75,61 @@ local function get_explorer_obj(state)
 				},
 				list = {}
 			},
+			state = state,
 		}
+
+		function xp:save_path(selected)
+			if self.state.location.rootState.location.type == "nodemeta" then
+				local savedata = {
+						stack = {},
+						selected = selected,
+					}
+				for _, stacknode in ipairs(self.stack) do
+					if stacknode.parent then
+						table.insert(savedata.stack, stacknode.label)
+					end
+				end
+				local meta = minetest.get_meta(self.state.location.rootState.location.pos)
+				meta:set_string("qa_explorer", minetest.serialize(savedata))
+			end
+		end
+
+		function xp:load_path()
+			if self.state.location.rootState.location.type == "nodemeta" then
+				local meta = minetest.get_meta(self.state.location.rootState.location.pos)
+				local serialized_data = meta:get_string("qa_explorer")
+				local savedata
+				if serialized_data then
+					savedata = minetest.deserialize(serialized_data)
+				end
+				if savedata and savedata.stack then
+					local cursor = _G
+					for _, label in ipairs(savedata.stack) do
+						if cursor[label] then
+							table.insert(self.stack, {
+									label = label,
+									ref = cursor[label],
+									parent = cursor,
+									--text =
+								})
+							cursor = cursor[label]
+						else
+							break
+						end
+					end
+					return savedata.selected
+				end
+			end
+		end
+
 		return xp
 	end
 
 	-- get session state reference
-	if not state._explorer then
-		state._explorer = new_explorer()
+	if not state.param._explorer then
+		state.param._explorer = new_explorer()
 	end
-	return state._explorer
+	return state.param._explorer
 end
 
 
@@ -141,17 +187,22 @@ local function _explore_dialog(state)
 				lb_current:addItem(stackentry.text)
 			end
 		end
+		explorer:save_path(index)
 	end
 
 	local explorer = get_explorer_obj(state)
+	local selected = explorer:load_path()
 	lb_stack:clearItems()
 	for _, stacknode in ipairs(explorer.stack) do
 		local idx = lb_stack:addItem(stacknode.label)
 		stacknode.idx = idx
 	end
+	lb_stack:setSelected(selected)
 	lb_stack:onClick(function(self, state, index)
 		update_current(state, index)
 	end)
+
+	update_current(state, selected)
 
 	ck_funchide:onToggle(function(self, state)
 		update_current(state, state:get("stack"):getSelected())
