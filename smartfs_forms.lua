@@ -103,6 +103,7 @@ local function _explore_dialog(state)
 		local ck_funchide = state:get("funchide")
 		local stackentry = explorer.stack[index]
 		local search = state:get("search"):getText()
+		state.param.explore_search = search
 		explorer.list = {}
 		if stackentry then
 			for name, val in pairs(stackentry.ref) do
@@ -190,8 +191,16 @@ local function _explore_dialog(state)
 		end
 	end)
 
+	fld_search:setCloseOnEnter(false)
+
 	btn_search:onClick(function(self, state)
 		update_current(state, state:get("stack"):getSelected())
+	end)
+
+	state:onInput(function(state, fields, player)
+		if state.param.explore_search ~= state:get("search"):getText() then
+			update_current(state, state:get("stack"):getSelected())
+		end
 	end)
 end
 

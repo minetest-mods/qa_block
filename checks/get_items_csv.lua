@@ -42,10 +42,10 @@ end
 
 -- write header line
 for k, _ in pairs(item_attributes) do
-	print(k, expand)
+	print(k)
 	if k == expand then
 		for kv, _ in pairs(expand_attributes) do
-			print("expand", kv)
+			print(expand..":"..kv)
 			file:write(format_value(expand..":"..kv))
 		end
 	else
