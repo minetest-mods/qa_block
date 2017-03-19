@@ -4,28 +4,27 @@
 local defaultmodule = "empty"
 local print_to_chat = true
 
-local modpath = minetest.get_modpath("qa_block")
-local filepath = modpath.."/checks/"
-
 -----------------------------------------------
 -- Load external libs and other files
 -----------------------------------------------
 qa_block = {}
-local thismodpath = minetest.get_modpath(minetest.get_current_modname())
+qa_block.modpath = minetest.get_modpath(minetest.get_current_modname())
+local filepath = qa_block.modpath.."/checks/"
 
 --[[ --temporary buildin usage (again)
 local smartfs_enabled = false
 if minetest.get_modpath("smartfs") and
 		smartfs.nodemeta_on_receive_fields then -- nodemeta handling implemented, right version.
-	dofile(thismodpath.."/smartfs_forms.lua")
+	dofile(qa_block.modpath.."/smartfs_forms.lua")
 	smartfs_enabled = true
 else
 	print("WARNING: qa_block without (compatible) smartfs is limited functionality")
 end
 ]]
-local smartfs = dofile(thismodpath.."/smartfs.lua")
+
+local smartfs = dofile(qa_block.modpath.."/smartfs.lua")
 qa_block.smartfs = smartfs
-dofile(thismodpath.."/smartfs_forms.lua")
+dofile(qa_block.modpath.."/smartfs_forms.lua")
 smartfs_enabled = true
 
 -----------------------------------------------

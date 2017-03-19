@@ -1,6 +1,6 @@
 local fileslist
 local smartfs = qa_block.smartfs --use provided
-
+local storage = dofile(qa_block.modpath.."/storage.lua")
 
 -----------------------------------------------
 -- Scripts / Checks tab view
@@ -79,30 +79,23 @@ local function get_explorer_obj(state)
 		}
 
 		function xp:save_path(selected)
-			if self.state.location.rootState.location.type == "nodemeta" then
-				local savedata = {
-						stack = {},
-						selected = selected,
-					}
-				for _, stacknode in ipairs(self.stack) do
-					if stacknode.parent then
-						table.insert(savedata.stack, stacknode.label)
-					end
+			local savedata = {
+					stack = {},
+					selected = selected,
+				}
+			for _, stacknode in ipairs(self.stack) do
+				if stacknode.parent then
+					table.insert(savedata.stack, stacknode.label)
 				end
-				local meta = minetest.get_meta(self.state.location.rootState.location.pos)
-				meta:set_string("qa_explorer", minetest.serialize(savedata))
 			end
+			state.param.persist.data.qa_explorer = savedata
+			state.param.persist:save()
 		end
 
-		function xp:load_path()
-			if self.state.location.rootState.location.type == "nodemeta" then
-				local meta = minetest.get_meta(self.state.location.rootState.location.pos)
-				local serialized_data = meta:get_string("qa_explorer")
-				local savedata
-				if serialized_data then
-					savedata = minetest.deserialize(serialized_data)
-				end
-				if savedata and savedata.stack then
+		function xp:restore_path()
+			if state.param.persist.data.qa_explorer then
+				local savedata = state.param.persist.data.qa_explorer
+				if savedata.stack then
 					local cursor = _G
 					for _, label in ipairs(savedata.stack) do
 						if cursor[label] then
@@ -142,6 +135,9 @@ local function _explore_dialog(state)
 	local fld_search = state:field(8, 7.32, 2, 0.5, "search")
 	local btn_search = state:button(9.7,7,1,0.5,"search_btn", "Search")
 	local ck_funchide = state:checkbox(11, 6.75, "funchide", "Hide functions")
+	if state.param.persist.data.explorer_funchide then
+		ck_funchide:setValue(state.param.persist.data.explorer_funchide)
+	end
 
 	local function update_current(state, index)
 		local lb_current = state:get("current")
@@ -187,11 +183,13 @@ local function _explore_dialog(state)
 				lb_current:addItem(stackentry.text)
 			end
 		end
+		state.param.persist.data.explorer_funchide = ck_funchide:getValue()
 		explorer:save_path(index)
+		state.param.persist:save()
 	end
 
 	local explorer = get_explorer_obj(state)
-	local selected = explorer:load_path()
+	local selected = explorer:restore_path()
 	lb_stack:clearItems()
 	for _, stacknode in ipairs(explorer.stack) do
 		local idx = lb_stack:addItem(stacknode.label)
@@ -260,6 +258,10 @@ end
 -- Root view / tabs
 -----------------------------------------------
 local function _root_dialog(state)
+
+	state.param.persist = storage.new(state.location)
+	state.param.persist:restore()
+
 	--set screen size
 	state:size(14,10)
 	-- tabbed view controller
@@ -271,12 +273,14 @@ local function _root_dialog(state)
 				if name == tabname then
 					def.button:setBackground("halo.png")
 					def.view:setVisible(true)
+					self.active_name = tabname
+					state.param.persist.data.main_tab = tabname
+					state.param.persist:save()
 				else
 					def.button:setBackground(nil)
 					def.view:setVisible(false)
 				end
 			end
-			self.active_name = tabname
 		end,
 		tab_add = function(self, name, def)
 			def.viewstate:size(14,8) --size of tab view
@@ -305,6 +309,10 @@ local function _root_dialog(state)
 	tab2.viewstate = tab2.view:getContainerState()
 	_explore_dialog(tab2.viewstate)
 	tab_controller:tab_add("tab2", tab2)
+
+	if state.param.persist.data.main_tab then
+		tab_controller:set_active(state.param.persist.data.main_tab)
+	end
 	if not tab_controller:get_active_name() then
 		tab_controller:set_active("tab1")
 	end
