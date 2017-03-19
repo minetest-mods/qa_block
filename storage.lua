@@ -18,12 +18,6 @@ function storage.new(location)
 			local serialized_data = meta:get_string("qa_block_data")
 			if serialized_data then
 				self.data = minetest.deserialize(serialized_data) or {}
-			else
-				-- compatibility to first version till 20.03.2017
-				serialized_data = meta:get_string("qa_explorer")
-				if serialized_data then
-					self.data.qa_explorer = minetest.deserialize(serialized_data) or {}
-				end
 			end
 		end
 	end

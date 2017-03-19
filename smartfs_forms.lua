@@ -84,9 +84,11 @@ local function get_explorer_obj(state)
 					selected = selected,
 				}
 			for _, stacknode in ipairs(self.stack) do
+				local saveentry = { search = stacknode.search }
 				if stacknode.parent then
-					table.insert(savedata.stack, stacknode.label)
+					saveentry.label = stacknode.label
 				end
+				table.insert(savedata.stack, saveentry)
 			end
 			state.param.persist.data.qa_explorer = savedata
 			state.param.persist:save()
@@ -97,15 +99,18 @@ local function get_explorer_obj(state)
 				local savedata = state.param.persist.data.qa_explorer
 				if savedata.stack then
 					local cursor = _G
-					for _, label in ipairs(savedata.stack) do
-						if cursor[label] then
+					for _, saveentry in ipairs(savedata.stack) do
+						if not saveentry.label then -- root node
+							self.stack[1].search = saveentry.search
+						elseif cursor[saveentry.label] then
 							table.insert(self.stack, {
-									label = label,
-									ref = cursor[label],
+									label = saveentry.label,
+									search = saveentry.search,
+									ref = cursor[saveentry.label],
 									parent = cursor,
 									--text =
 								})
-							cursor = cursor[label]
+							cursor = cursor[saveentry.label]
 						else
 							break
 						end
@@ -135,8 +140,8 @@ local function _explore_dialog(state)
 	local fld_search = state:field(8, 7.32, 2, 0.5, "search")
 	local btn_search = state:button(9.7,7,1,0.5,"search_btn", "Search")
 	local ck_funchide = state:checkbox(11, 6.75, "funchide", "Hide functions")
-	if state.param.persist.data.explorer_funchide then
-		ck_funchide:setValue(state.param.persist.data.explorer_funchide)
+	if state.param.persist.data.explore_funchide then
+		ck_funchide:setValue(state.param.persist.data.explore_funchide)
 	end
 
 	local function update_current(state, index)
@@ -144,12 +149,11 @@ local function _explore_dialog(state)
 		local explorer = get_explorer_obj(state)
 		local ck_funchide = state:get("funchide")
 		local stackentry = explorer.stack[index]
-		local search = state:get("search"):getText()
-		state.param.explore_search = search
 		explorer.list = {}
 		if stackentry then
+			state:get("search"):setText(stackentry.search or "")
 			for name, val in pairs(stackentry.ref) do
-				if string.match(name, search) then
+				if string.match(name, stackentry.search or "") then
 					local entry
 					local sval
 					local t = type(val)
@@ -183,7 +187,7 @@ local function _explore_dialog(state)
 				lb_current:addItem(stackentry.text)
 			end
 		end
-		state.param.persist.data.explorer_funchide = ck_funchide:getValue()
+		state.param.persist.data.explore_funchide = ck_funchide:getValue()
 		explorer:save_path(index)
 		state.param.persist:save()
 	end
@@ -212,6 +216,7 @@ local function _explore_dialog(state)
 		if not explorer.list[index] then
 			return
 		end
+
 		if type(explorer.list[index].ref) == "table" then
 			local nav_to = explorer.list[index]
 			-- cleanup stack before add the item
@@ -247,8 +252,11 @@ local function _explore_dialog(state)
 	end)
 
 	state:onInput(function(state, fields, player)
-		if state.param.explore_search ~= state:get("search"):getText() then
-			update_current(state, state:get("stack"):getSelected())
+		local selected = state:get("stack"):getSelected()
+		local stackentry = explorer.stack[selected]
+		if stackentry and stackentry.search ~= state:get("search"):getText() then
+			stackentry.search = state:get("search"):getText()
+			update_current(state, selected)
 		end
 	end)
 end
