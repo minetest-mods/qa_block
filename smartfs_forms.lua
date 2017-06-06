@@ -152,7 +152,8 @@ local function _explore_dialog(state)
 		explorer.list = {}
 		if stackentry then
 			state:get("search"):setText(stackentry.search or "")
-			for name, val in pairs(stackentry.ref) do
+			for name_raw, val in pairs(stackentry.ref) do
+				local name = tostring(name_raw)
 				if string.match(name, stackentry.search or "") then
 					local entry
 					local sval
