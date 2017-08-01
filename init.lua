@@ -171,6 +171,32 @@ minetest.register_chatcommand("qa", {
 	end
 })
 
+
+local doc_items_longdesc =
+[[QA Block is a quality assurance tool for mod- and subgame
+developers. Using the block it is possible to:
+ - Browse trough  global lua variables for deeper insight
+ - Execute adhoc lua code for testing reasons in development
+ - Run predefined checks for quality assurance
+]]
+
+local doc_items_usagehelp =
+[[Place the block and open the node formspec using right mouse click
+Use "Globals" tab for browsing trough lua global variables
+Use "Checks" tab to run lua code. Editing the code before the run
+allowed.
+The checks are readed from $MODPATH/checks folder. It is possible to add
+new lua files to the folder and run them without restarting the game.
+Just use the refresh button.
+
+Ususally the print() command is used in checks, so look to the console
+output (linux) or debug.txt (W$) for output.
+
+Some chat commands are defined as shortcuts. See "/qa help" for more
+informations. Pls. note the "/qa ui" cannot store the current globals
+navigation, the navigation can be stored in qa-block node only.
+]]
+
 -----------------------------------------------
 -- Block node definition - with optional smartfs integration
 -----------------------------------------------
@@ -190,5 +216,7 @@ minetest.register_node("qa_block:block", {
 		if smartfs_enabled then
 			smartfs.nodemeta_on_receive_fields(pos, formname, fields, sender)
 		end
-	end
+	end,
+	_doc_items_longdesc = doc_items_longdesc,
+	_doc_items_usagehelp = doc_items_usagehelp,
 })
