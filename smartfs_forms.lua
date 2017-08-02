@@ -247,18 +247,17 @@ local function _explore_dialog(state)
 	end)
 
 	fld_search:setCloseOnEnter(false)
-
-	btn_search:onClick(function(self, state)
-		update_current(state, state:get("stack"):getSelected())
-	end)
-
-	state:onInput(function(state, fields, player)
+	fld_search:onKeyEnter(function(self, state, player)
 		local selected = state:get("stack"):getSelected()
 		local stackentry = explorer.stack[selected]
-		if stackentry and stackentry.search ~= state:get("search"):getText() then
-			stackentry.search = state:get("search"):getText()
+		if stackentry then
+			stackentry.search = self:getText()
 			update_current(state, selected)
 		end
+	end)
+
+	btn_search:onClick(function(self, state, player)
+		state:get("search"):submit_key_enter("",player)
 	end)
 end
 
