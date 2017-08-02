@@ -109,6 +109,7 @@ local function get_explorer_obj(state)
 									ref = cursor[saveentry.label],
 									parent = cursor,
 									--text =
+									--data_type
 								})
 							cursor = cursor[saveentry.label]
 						else
@@ -175,7 +176,8 @@ local function _explore_dialog(state)
 							label = name,
 							ref = val,
 							parent = stackentry,
-							text = entry
+							text = entry,
+							data_type = t,
 						})
 					end
 				end
@@ -185,7 +187,18 @@ local function _explore_dialog(state)
 			end)
 			lb_current:clearItems()
 			for _, stackentry in ipairs(explorer.list) do
-				lb_current:addItem(stackentry.text)
+				local color_code = ""
+				if stackentry.data_type == "number" then
+					color_code = "#FFFF00"
+				elseif stackentry.data_type == "string" then
+					color_code = "#00FFFF"
+				elseif stackentry.data_type == "function" then
+					color_code = "#800080"
+				else --table
+					color_code = "#FFFFFF"
+				end
+				print("color_code..stackentry.text")
+				lb_current:addItem(color_code..stackentry.text)
 			end
 		end
 		state.param.persist.data.explore_funchide = ck_funchide:getValue()
