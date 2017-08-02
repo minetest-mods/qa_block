@@ -197,7 +197,6 @@ local function _explore_dialog(state)
 				else --table
 					color_code = "#FFFFFF"
 				end
-				print("color_code..stackentry.text")
 				lb_current:addItem(color_code..stackentry.text)
 			end
 		end
