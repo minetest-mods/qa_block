@@ -131,8 +131,14 @@ local function get_explorer_obj(state)
 	return state.param._explorer
 end
 
-local function clear_string(data)
-	return data:gsub("\n", "\\n"):gsub("\t", "\\t"):sub(1,40)
+local function clear_string(data, cut_len)
+	local len = string.len(data)
+	local out = data:gsub("\n", "\\n"):gsub("\t", "\\t")
+	if len > cut_len then
+		return out:sub(1,cut_len-3).."..."
+	else
+		return out
+	end
 end
 
 local function _explore_dialog(state)
@@ -157,22 +163,16 @@ local function _explore_dialog(state)
 		if stackentry then
 			state:get("search"):setText(stackentry.search or "")
 			for name_raw, val in pairs(stackentry.ref) do
-				local name = clear_string(tostring(name_raw))
+				local name = clear_string(tostring(name_raw),30)
 				if string.match(name, stackentry.search or "") then
 					local entry
-					local sval
 					local t = type(val)
 					if t == "number" or t == "string" or t == "boolean" then
-						local sval = dump(val)
-						if string.len(sval) < 64 then
-							entry = name .. ": type \""..t.."\", value: " .. sval
-						else
-							entry = name .. ": type \""..t.."\", long value"
-						end
+						entry = name .. ': type "' .. t .. '", value: ' .. clear_string(dump(val),60)
 					elseif t == "function" then
-						entry = name .. ": type \""..t.."\",.. source: "..debug.getinfo(val).source
+						entry = name .. ': type "' .. t .. '", value: ' .. debug.getinfo(val).source
 					else
-						entry = name .. ": type \""..t.."\""
+						entry = name .. ': type "' .. t ..'"'
 					end
 					if not (ck_funchide:getValue() == true and t == "function") then
 						table.insert(explorer.list, {
@@ -220,7 +220,7 @@ local function _explore_dialog(state)
 	local selected = explorer:restore_path()
 	lb_stack:clearItems()
 	for _, stacknode in ipairs(explorer.stack) do
-		local idx = lb_stack:addItem(clear_string(stacknode.label))
+		local idx = lb_stack:addItem(clear_string(stacknode.label, 40))
 		stacknode.idx = idx
 	end
 	lb_stack:setSelected(selected)
@@ -253,7 +253,7 @@ local function _explore_dialog(state)
 				end
 			end
 			-- add selected to stack and select on stack
-			local idx = lb_stack:addItem(clear_string(nav_to.label))
+			local idx = lb_stack:addItem(clear_string(nav_to.label, 40))
 			lb_stack:setSelected(idx)
 			explorer.stack[idx] = nav_to
 			nav_to.idx = idx
