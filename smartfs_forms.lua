@@ -255,21 +255,23 @@ local function _explore_dialog(state)
 			explorer.stack[idx] = nav_to
 			nav_to.idx = idx
 			update_current(state, idx)
-		elseif nav_to.data_type == "function" then
-			-- just print the long debug line
-			print(nav_to.text)
-		else
+		elseif nav_to.data_type == "string" or nav_to.data_type == "number" or nav_to.data_type == "boolean" then
 			-- Change the value (string or number)
 			local edit_state = state.location.parentState:get("tab3_view"):getContainerState()
 			-- press invisible button
-			if nav_to.data_type == "number" then
-				edit_state:get("chk_is_number"):setValue(true)
-			else
-				edit_state:get("chk_is_number"):setValue(false)
+			if nav_to.data_type == "string" then
+				edit_state:get("tg_type"):setId(1)
+			elseif nav_to.data_type == "number" then
+				edit_state:get("tg_type"):setId(2)
+			elseif nav_to.data_type == "boolean" then
+				edit_state:get("tg_type"):setId(3)
 			end
 			edit_state:get("txt_value"):setText(tostring(nav_to.ref))
 			edit_state:setparam("edit_node", nav_to)
 			state.location.parentState:get("tab3_btn"):submit()
+		else
+			-- just print the (maybe) long line
+			print(nav_to.text)
 		end
 	end)
 
@@ -302,11 +304,14 @@ local function _change_value_dialog(state)
 	state:button(1,7,2,1,"btn_ok","Update"):onClick(function(self, state, player)
 		local lua_node = state:getparam("edit_node")
 		local new_value = state:get("txt_value"):getText()
-		if state:get("chk_is_number"):getValue() then
+		local toggle = state:get("tg_type"):getId()
+		if toggle == 2 then
 			new_value = tonumber(new_value)
+		elseif toggle == 3 then
+			new_value = minetest.is_yes(new_value)
 		end
-		if not new_value then
-			print("value conversion to number failed")
+		if new_value == nil then
+			print("value conversion failed")
 			return
 		end
 		lua_node.parent.ref[lua_node.label] = new_value
@@ -320,7 +325,7 @@ local function _change_value_dialog(state)
 		state.location.parentState:get("tab2_btn"):submit()
 	end)
 
-	state:checkbox(5, 7, "chk_is_number", "Is number, not string")
+	state:toggle(5,7,2,1, "tg_type", {"String", "Number", "Boolean"})
 end
 -----------------------------------------------
 -- Root view / tabs
