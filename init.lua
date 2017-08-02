@@ -176,6 +176,7 @@ local doc_items_longdesc =
 [[The QA block is a quality assurance tool for mod and subgame developers.
 By using the block it is possible to:
 • Browse trough global Lua variables for deeper insight
+• Edit global Lua variables
 • Execute ad-hoc Lua code for testing reasons in development
 • Run predefined checks for quality assurance
 ]]
@@ -183,6 +184,7 @@ By using the block it is possible to:
 local doc_items_usagehelp =
 [[Place the block and open the formspec using right mouse click.
 Use the “Globals” tab for browsing trough global Lua variables.
+Double-Click to entries to navigate into a table, print long function source or edit numeric or string values
 Use the “Checks” tab to run Lua code. Editing the code before running is allowed.
 The checks are read from the $MODPATH/checks directory.
 It is possible to add new Lua files and run them without restarting the game. Just use the Refresh button.

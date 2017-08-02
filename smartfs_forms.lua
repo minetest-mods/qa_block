@@ -226,12 +226,12 @@ local function _explore_dialog(state)
 	lb_current:onDoubleClick(function(self, state, index)
 		local explorer = get_explorer_obj(state)
 		local lb_stack = state:get("stack")
-		if not explorer.list[index] then
+		local nav_to = explorer.list[index]
+		if not nav_to then
 			return
 		end
 
-		if type(explorer.list[index].ref) == "table" then
-			local nav_to = explorer.list[index]
+		if nav_to.data_type == "table" then
 			-- cleanup stack before add the item
 			for i = #explorer.stack, 1, -1 do
 				if nav_to.parent.idx < explorer.stack[i].idx then
@@ -247,6 +247,21 @@ local function _explore_dialog(state)
 			explorer.stack[idx] = nav_to
 			nav_to.idx = idx
 			update_current(state, idx)
+		elseif nav_to.data_type == "function" then
+			-- just print the long debug line
+			print(nav_to.text)
+		else
+			-- Change the value (string or number)
+			local edit_state = state.location.parentState:get("tab3_view"):getContainerState()
+			-- press invisible button
+			if nav_to.data_type == "number" then
+				edit_state:get("chk_is_number"):setValue(true)
+			else
+				edit_state:get("chk_is_number"):setValue(false)
+			end
+			edit_state:get("txt_value"):setText(tostring(nav_to.ref))
+			edit_state:setparam("edit_node", nav_to)
+			state.location.parentState:get("tab3_btn"):submit()
 		end
 	end)
 
@@ -274,6 +289,31 @@ local function _explore_dialog(state)
 end
 
 
+local function _change_value_dialog(state)
+	state:textarea(1, 1, 12, 7, "txt_value", "Value")
+	state:button(1,7,2,1,"btn_ok","Update"):onClick(function(self, state, player)
+		local lua_node = state:getparam("edit_node")
+		local new_value = state:get("txt_value"):getText()
+		if state:get("chk_is_number"):getValue() then
+			new_value = tonumber(new_value)
+		end
+		if not new_value then
+			print("value conversion to number failed")
+			return
+		end
+		lua_node.parent.ref[lua_node.label] = new_value
+
+		local list_state = state.location.parentState:get("tab2_view"):getContainerState()
+		list_state:get("funchide"):submit() --just trigger the list update
+		state.location.parentState:get("tab2_btn"):submit()
+	end)
+
+	state:button(3,7,2,1,"btn_cancel","Cancel"):onClick(function(self, state, player)
+		state.location.parentState:get("tab2_btn"):submit()
+	end)
+
+	state:checkbox(5, 7, "chk_is_number", "Is number, not string")
+end
 -----------------------------------------------
 -- Root view / tabs
 -----------------------------------------------
@@ -312,8 +352,9 @@ local function _root_dialog(state)
 	}
 	local tab1 = {}
 	tab1.button = state:button(0,0,2,1,"tab1_btn","Checks")
-	tab1.button:onClick(function(self)
+	tab1.button:onClick(function(self, state, player)
 		tab_controller:set_active("tab1")
+		state:get("tab3_btn"):setVisible(false)
 	end)
 	tab1.view = state:container(0,1,"tab1_view")
 	tab1.viewstate = tab1.view:getContainerState()
@@ -322,13 +363,26 @@ local function _root_dialog(state)
 
 	local tab2 = {}
 	tab2.button = state:button(2,0,2,1,"tab2_btn","Globals")
-	tab2.button:onClick(function(self)
+	tab2.button:onClick(function(self, state, player)
 		tab_controller:set_active("tab2")
+		state:get("tab3_btn"):setVisible(false)
 	end)
 	tab2.view = state:container(0,1,"tab2_view")
 	tab2.viewstate = tab2.view:getContainerState()
 	_explore_dialog(tab2.viewstate)
 	tab_controller:tab_add("tab2", tab2)
+
+	local tab3 = {}
+	tab3.button = state:button(4,0,2,1,"tab3_btn","Value")
+	tab3.button:onClick(function(self, state, player)
+		self:setVisible()
+		tab_controller:set_active("tab3")
+	end)
+	tab3.view = state:container(0,1,"tab3_view")
+	tab3.viewstate = tab3.view:getContainerState()
+	_change_value_dialog(tab3.viewstate)
+	tab_controller:tab_add("tab3", tab3)
+	tab3.button:setVisible(false)
 
 	if state.param.persist.data.main_tab then
 		tab_controller:set_active(state.param.persist.data.main_tab)
