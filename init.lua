@@ -173,28 +173,22 @@ minetest.register_chatcommand("qa", {
 
 
 local doc_items_longdesc =
-[[QA Block is a quality assurance tool for mod- and subgame
-developers. Using the block it is possible to:
- - Browse trough  global lua variables for deeper insight
- - Execute adhoc lua code for testing reasons in development
- - Run predefined checks for quality assurance
+[[The QA block is a quality assurance tool for mod and subgame developers.
+By using the block it is possible to:
+• Browse trough global Lua variables for deeper insight
+• Execute ad-hoc Lua code for testing reasons in development
+• Run predefined checks for quality assurance
 ]]
 
 local doc_items_usagehelp =
-[[Place the block and open the node formspec using right mouse click
-Use "Globals" tab for browsing trough lua global variables
-Use "Checks" tab to run lua code. Editing the code before the run
-allowed.
-The checks are readed from $MODPATH/checks folder. It is possible to add
-new lua files to the folder and run them without restarting the game.
-Just use the refresh button.
-
-Ususally the print() command is used in checks, so look to the console
-output (linux) or debug.txt (W$) for output.
-
-Some chat commands are defined as shortcuts. See "/qa help" for more
-informations. Pls. note the "/qa ui" cannot store the current globals
-navigation, the navigation can be stored in qa-block node only.
+[[Place the block and open the formspec using right mouse click.
+Use the “Globals” tab for browsing trough global Lua variables.
+Use the “Checks” tab to run Lua code. Editing the code before running is allowed.
+The checks are read from the $MODPATH/checks directory.
+It is possible to add new Lua files and run them without restarting the game. Just use the Refresh button.
+Ususally the print() command is used in checks, so look in debug.txt or the Minetest console output.
+Some chat commands are defined as shortcuts. See “/qa help” for more information.
+Please note the “/qa ui” cannot store the current globals navigation, the navigation can be stored in the QA block only.
 ]]
 
 -----------------------------------------------
