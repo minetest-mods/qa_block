@@ -193,9 +193,17 @@ local function _explore_dialog(state)
 				elseif stackentry.data_type == "string" then
 					color_code = "#00FFFF"
 				elseif stackentry.data_type == "function" then
-					color_code = "#800080"
-				else --table
+					color_code = "#FF00FF"
+				elseif stackentry.data_type == "boolean" then
+					color_code = "#00FF00"
+				elseif stackentry.data_type == "userdata" then
+					color_code = "#FF8000"
+				elseif stackentry.data_type == "thread" then
+					color_code = "#FF0000"
+				elseif stackentry.data_type == "table" then
 					color_code = "#FFFFFF"
+				else -- other
+					color_code = "#A0A0A0"
 				end
 				lb_current:addItem(color_code..stackentry.text)
 			end
