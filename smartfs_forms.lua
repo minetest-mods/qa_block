@@ -131,6 +131,9 @@ local function get_explorer_obj(state)
 	return state.param._explorer
 end
 
+local function clear_string(data)
+	return data:gsub("\n", "\\n"):gsub("\t", "\\t"):sub(1,40)
+end
 
 local function _explore_dialog(state)
 	state:size(13,7.25)
@@ -154,7 +157,7 @@ local function _explore_dialog(state)
 		if stackentry then
 			state:get("search"):setText(stackentry.search or "")
 			for name_raw, val in pairs(stackentry.ref) do
-				local name = tostring(name_raw)
+				local name = clear_string(tostring(name_raw))
 				if string.match(name, stackentry.search or "") then
 					local entry
 					local sval
@@ -217,7 +220,7 @@ local function _explore_dialog(state)
 	local selected = explorer:restore_path()
 	lb_stack:clearItems()
 	for _, stacknode in ipairs(explorer.stack) do
-		local idx = lb_stack:addItem(stacknode.label)
+		local idx = lb_stack:addItem(clear_string(stacknode.label))
 		stacknode.idx = idx
 	end
 	lb_stack:setSelected(selected)
@@ -250,7 +253,7 @@ local function _explore_dialog(state)
 				end
 			end
 			-- add selected to stack and select on stack
-			local idx = lb_stack:addItem(nav_to.label)
+			local idx = lb_stack:addItem(clear_string(nav_to.label))
 			lb_stack:setSelected(idx)
 			explorer.stack[idx] = nav_to
 			nav_to.idx = idx
