@@ -75,9 +75,9 @@ end
 -- Smartfs Interface - Returns the name of an installed and supported inventory mod that will be used above, or nil
 ------------------------------------------------------
 function smartfs.inventory_mod()
-	if unified_inventory then
+	if minetest.global_exists("unified_inventory") then
 		return "unified_inventory"
-	elseif inventory_plus then
+	elseif minetest.global_exists("inventory_plus") then
 		return "inventory_plus"
 	else
 		return nil
@@ -187,9 +187,7 @@ smartfs._ldef.player = {
 					minetest.after(0, function(state)
 						if state then
 							state._show_queued = nil
-							if (not state.closed) and (not state.obsolete) then
-								minetest.show_formspec(state.location.player, state.def.name, state:_buildFormspec_(true))
-							end
+							minetest.show_formspec(state.location.player, state.def.name, state:_buildFormspec_(true))
 						end
 					end, state) -- state given as reference. Maybe additional updates are done in the meantime or the form is obsolete
 				end
@@ -215,7 +213,6 @@ smartfs._ldef.inventory = {
 		end)
 		minetest.register_on_leaveplayer(function(player)
 			local name = player:get_player_name()
-			smartfs.inv[name].obsolete = true
 			smartfs.inv[name] = nil
 		end)
 	end,
@@ -255,6 +252,7 @@ smartfs._ldef.nodemeta = {
 							local meta = minetest.get_meta(state.location.pos)
 							meta:set_string("formspec", state:_buildFormspec_(true))
 							meta:set_string("smartfs_name", state.def.name)
+							meta:mark_as_private("smartfs_name")
 						end
 					end, state)
 				end
@@ -296,13 +294,9 @@ function smartfs.nodemeta_on_receive_fields(nodepos, formname, fields, sender, p
 	local state
 	local form = smartfs.get(nodeform)
 	if not smartfs.opened[opened_id] or      -- If opened first time
-			smartfs.opened[opened_id].def.name ~= nodeform or -- Or form is changed
-			smartfs.opened[opened_id].obsolete then
+			smartfs.opened[opened_id].def.name ~= nodeform then -- Or form is changed
 		local statelocation = smartfs._ldef.nodemeta._make_state_location_(nodepos)
 		state = smartfs._makeState_(form, params, statelocation)
-		if smartfs.opened[opened_id] then
-			smartfs.opened[opened_id].obsolete = true
-		end
 		smartfs.opened[opened_id] = state
 		form.form_setup_callback(state)
 	else
@@ -320,7 +314,7 @@ function smartfs.nodemeta_on_receive_fields(nodepos, formname, fields, sender, p
 	state:_sfs_on_receive_fields_(name, fields)
 
 	-- Reset form if all players disconnected
-	if sender and not state.players:get_first() and not state.obsolete then
+	if sender and not state.players:get_first() then
 		local statelocation = smartfs._ldef.nodemeta._make_state_location_(nodepos)
 		local resetstate = smartfs._makeState_(form, params, statelocation)
 		if form.form_setup_callback(resetstate) ~= false then
@@ -338,13 +332,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if smartfs.opened[name] and smartfs.opened[name].location.type == "player" then
 		if smartfs.opened[name].def.name == formname then
 			local state = smartfs.opened[name]
-			state:_sfs_on_receive_fields_(name, fields)
-
-			-- disconnect player if form closed
-			if not state.players:get_first() then
-				smartfs.opened[name].obsolete = true
-				smartfs.opened[name] = nil
-			end
+			return state:_sfs_on_receive_fields_(name, fields)
+		else
+			smartfs.opened[name] = nil
 		end
 	elseif smartfs.inv[name] and smartfs.inv[name].location.type == "inventory" then
 		local state = smartfs.inv[name]
@@ -370,9 +360,6 @@ function smartfs._show_(form, name, params)
 	local statelocation = smartfs._ldef.player._make_state_location_(name)
 	local state = smartfs._makeState_(form, params, statelocation, name)
 	if form.form_setup_callback(state) ~= false then
-		if smartfs.opened[name] then -- set maybe previous form to obsolete
-			smartfs.opened[name].obsolete = true
-		end
 		smartfs.opened[name] = state
 		state:show()
 	end
@@ -389,10 +376,6 @@ function smartfs._attach_to_node_(form, nodepos, params)
 	local statelocation = smartfs._ldef.nodemeta._make_state_location_(nodepos)
 	local state = smartfs._makeState_(form, params, statelocation)
 	if form.form_setup_callback(state) ~= false then
-		local opened_id = minetest.pos_to_string(nodepos)
-		if smartfs.opened[opened_id] then -- set maybe previous form to obsolete
-			smartfs.opened[opened_id].obsolete = true
-		end
 		state:show()
 	end
 	return state
@@ -424,12 +407,6 @@ function smartfs._makeState_(form, params, location, newplayer)
 		return self
 	end
 
-	local compat_is_inv
-	if location.type == "inventory" then
-		compat_is_inv = true
-	else
-		compat_is_inv = false
-	end
 
 	------------------------------------------------------
 	-- State - create returning state object
@@ -439,8 +416,8 @@ function smartfs._makeState_(form, params, location, newplayer)
 		def = form,
 		players = _make_players_(newplayer),
 		location = location,
-		is_inv = compat_is_inv, -- obsolete / compatibility
-		player = newplayer, -- obsolete / compatibility
+		is_inv = (location.type == "inventory"), -- obsolete. Please use location.type="inventory" instead
+		player = newplayer, -- obsolete. Please use location.player
 		param = params or {},
 		get = function(self,name)
 			return self._ele[name]
@@ -473,7 +450,7 @@ function smartfs._makeState_(form, params, location, newplayer)
 			end
 			for key,val in pairs(self._ele) do
 				if val:getVisible() then
-					res = res .. val:getBackgroundString() .. val:build()
+					res = res .. val:getBackgroundString() .. val:build() .. val:getTooltipString()
 				end
 			end
 			return res
@@ -513,20 +490,24 @@ function smartfs._makeState_(form, params, location, newplayer)
 		end,
 		-- Receive fields and actions from formspec
 		_sfs_on_receive_fields_ = function(self, player, fields)
-			-- fields assignment
+
+			local fields_todo = {}
 			for field, value in pairs(fields) do
 				local element = self:_get_element_recursive_(field)
 				if element then
-					element:setValue(value)
+					fields_todo[field] = { element = element, value = value }
 				end
 			end
-			-- process onInput hooks
+
+			for field, todo in pairs(fields_todo) do
+				todo.element:setValue(todo.value)
+			end
+
 			self:_sfs_process_oninput_(fields, player)
-			-- do actions
-			for field, value in pairs(fields) do
-				local element = self:_get_element_recursive_(field)
-				if element and element.submit then
-					element:submit(value, player)
+
+			for field, todo in pairs(fields_todo) do
+				if todo.element.submit then
+					todo.element:submit(todo.value, player)
 				end
 			end
 			-- handle key_enter
@@ -536,12 +517,15 @@ function smartfs._makeState_(form, params, location, newplayer)
 					element:submit_key_enter(fields[fields.key_enter_field], player)
 				end
 			end
-			-- handle quit/exit
-			if not fields.quit and not self.closed and not self.obsolete then
+
+			if not fields.quit and not self.closed then
 				self:show()
 			else
 				self.players:disconnect(player)
-				if not fields.quit and self.closed and not self.obsolete then
+				if self.location.type == "player" then
+					smartfs.opened[player] = nil
+				end
+				if not fields.quit and self.closed then
 					--closed by application (without fields.quit). currently not supported, see: https://github.com/minetest/minetest/pull/4675
 					minetest.show_formspec(player,"","size[5,1]label[0,0;Formspec closing not yet created!]")
 				end
@@ -656,6 +640,19 @@ function smartfs._makeState_(form, params, location, newplayer)
 				end,
 				setValue = function(self, value)
 					self.data.value = value
+				end,
+				setTooltip = function(self,text)
+					self.data.tooltip = minetest.formspec_escape(text)
+				end,
+				getTooltip = function(self)
+					return self.data.tooltip
+				end,
+				getTooltipString = function(self)
+					if self.data.tooltip then
+						return "tooltip["..self:getAbsName()..";"..self:getTooltip().."]"
+					else
+						return ""
+					end
 				end,
 			}
 
@@ -879,9 +876,6 @@ smartfs.element("button", {
 		end
 		specstring = specstring..self:getAbsName()..";"..
 				minetest.formspec_escape(self.data.value).."]"
-		if self.data.tooltip then
-			specstring = specstring.."tooltip["..self:getAbsName()..";"..self.data.tooltip.."]"
-		end
 		return specstring
 	end,
 	submit = function(self, field, player)
@@ -914,12 +908,6 @@ smartfs.element("button", {
 	end,
 	getItem = function(self)
 		return self.data.item
-	end,
-	setTooltip = function(self,text)
-		self.data.tooltip = minetest.formspec_escape(text)
-	end,
-	getTooltip = function(self)
-		return self.data.tooltip
 	end,
 	setClose = function(self,bool)
 		self.data.closes = bool
