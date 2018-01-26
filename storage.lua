@@ -8,6 +8,7 @@ function storage.new(location)
 		if self.location.type == "nodemeta" then
 			local meta = minetest.get_meta(self.location.pos)
 			meta:set_string("qa_block_data", minetest.serialize(self.data))
+			meta:mark_as_private("qa_block_data")
 		end
 	end
 
