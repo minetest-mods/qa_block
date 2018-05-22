@@ -18,6 +18,7 @@ local blacklist = {
 	getfenv = true,
 	getmetatable = true,
 	ipairs = true,
+	jit = true,
 	load = true,
 	loadfile = true,
 	loadstring = true,
