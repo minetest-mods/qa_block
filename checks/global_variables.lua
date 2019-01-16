@@ -59,6 +59,7 @@ local blacklist = {
 	core = true,
 	dump = true,
 	dump2 = true,
+	Raycast = true,
 }
 
 -- part of minetest builtin, but needs to be discussed if it right or wrong
