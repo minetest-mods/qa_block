@@ -25,7 +25,7 @@ end
 local smartfs = dofile(qa_block.modpath.."/smartfs.lua")
 qa_block.smartfs = smartfs
 dofile(qa_block.modpath.."/smartfs_forms.lua")
-smartfs_enabled = true
+local smartfs_enabled = true
 
 -----------------------------------------------
 -- QA-Block functionality - list checks
