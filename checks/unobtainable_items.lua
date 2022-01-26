@@ -26,7 +26,7 @@ for item, def in pairs(minetest.registered_items) do
 				local dropname = dropstack:get_name()
 				items[dropname] = true
 			end
-		elseif type(def.drop) == "table" then
+		elseif type(def.drop) == "table" and def.drop.items then
 			for i=1,#def.drop.items do
 				for j=1,#def.drop.items[i].items do 
 					items[def.drop.items[i].items[j]] = true
