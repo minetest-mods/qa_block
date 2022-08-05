@@ -30,7 +30,7 @@ https://forum.minetest.net/viewtopic.php?f=11&t=15759
 - broken_recipe - Find crafting recipes which require unknown items
 - empty - Empty file for your own checks
 - get_item_csv - Export all registered items in a .CSV file
-- global_variables - Browse all global variables and see their content
+- global_variables - List suspicious global variables
 - graphviz_recipes_all - Make a graphviz .dot file of all items in a recipe dependency tree
 - is_ground_content - This checker lists all nodes for which is_ground_content == true
 - list_entities - Lists all the registered entities (except builtin)
