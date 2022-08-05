@@ -2,7 +2,14 @@
 -- Some hardcoded settings and constants
 -----------------------------------------------
 local defaultmodule = "empty"
-local print_to_chat = true
+
+local print_to_chat = minetest.settings:get_bool("qa_block.print_to_chat", true)
+local log_to_file = minetest.settings:get_bool("qa_block.log_to_file", false)
+local overwritelog = minetest.settings:get_bool("qa_block.overwrite_log", false)
+local logdatetime = minetest.settings:get_bool("qa_block.log_date_time", false)
+local datetimeformat = minetest.settings:get("qa_block.date_time_format") or "%Y-%m-%d %H:%M:%S"
+
+local logfilename = minetest.get_worldpath() .. "/qa_block.log"
 
 -----------------------------------------------
 -- Load external libs and other files
@@ -44,22 +51,57 @@ qa_block.get_checks_list = function()
 end
 
 -----------------------------------------------
--- QA-Block functionality - redefine print - reroute output to chat window
+-- QA-Block functionality - write log message to a file
 -----------------------------------------------
-if print_to_chat then
+function qa_block.write_log(msg)
+	local f = io.open(logfilename, "a")
+	if f then
+		if logdatetime then
+			f:write("[")
+			f:write(os.date(datetimeformat))
+			f:write("]  ")
+		end
+		f:write(msg)
+		f:write("\n")
+		f:close()
+	else
+		minetest.log("error", "could not open chatlog file for writing: " .. logfilename)
+	end
+end
+
+-----------------------------------------------
+-- QA-Block functionality - redefine print - reroute output to chat window and/or log file
+-----------------------------------------------
+if print_to_chat or log_to_file then
+
 	local function do_print_redefinition()
+
 		local old_print = print
 		print = function(...)
-			local outsting = ""
+			local outstring = ""
 			local out
 			local x
 			for x, out in ipairs({...}) do
-				outsting = (outsting..tostring(out)..'\t')
+				outstring = (outstring..tostring(out)..'\t')
 			end
-			old_print(outsting)
-			minetest.chat_send_all(outsting)
+			old_print(outstring)
+			if print_to_chat then
+				minetest.chat_send_all(outstring)
+			end
+			if log_to_file then
+				qa_block.write_log(outstring)
+			end
 		end
+
+		if overwritelog then
+			local f = io.open(logfilename, "w")
+			if f then
+				f:close()
+			end
+		end
+
 	end
+
 	minetest.after(0, do_print_redefinition)
 end
 
