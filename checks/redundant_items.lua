@@ -2,6 +2,8 @@
 
 --[[ Comparing the second part of the mane ]]
 
+local modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
+
 local items = {}
 
 local blacklist = {
@@ -11,7 +13,7 @@ local blacklist = {
 	wool = true,
 }
 
-for item, def in pairs(minetest.registered_items) do
+for item, def in modutils.pairsByKeys(minetest.registered_items) do
 	if item:find(':') then
 		local mod_name, item_name = unpack(item:split(':'))
 		if not blacklist[mod_name] and not def.groups.not_in_creative_inventory then

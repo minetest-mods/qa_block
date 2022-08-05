@@ -2,7 +2,9 @@
 
 -- Sounds are always optional, but most nodes SHOULD have sounds for good quality.
 
-for name, def in pairs(minetest.registered_nodes) do
+local modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
+
+for name, def in modutils.pairsByKeys(minetest.registered_nodes) do
 	local complaints = {}
 	local failed = false
 	-- Air and ignore are allowed to be silent

@@ -68,4 +68,29 @@ function modutils.get_depend_checker(modname)
 	return self
 end
 
+-----------------------------------------------
+-- Return a list of keys sorted - Useful when looking for regressions
+-- https://www.lua.org/pil/19.3.html
+-----------------------------------------------
+function modutils.pairsByKeys (t)
+	if not t then
+		return function()
+			return nil
+		end
+	end
+
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+	table.sort(a)
+	local i = 0      -- iterator variable
+	local iter = function ()   -- iterator function
+			i = i + 1
+			if a[i] == nil then return nil
+			else return a[i], t[a[i]]
+			end
+	end
+	return iter
+end
+
+
 return modutils

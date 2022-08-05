@@ -48,7 +48,7 @@ local check_item = function(itemstring, bad_item_msg, bad_group_msg, is_output)
 			print(bad_group_msg .. ". Full string: \""..item.."\")")
 			return
 		end
-		for g=1, #groups do
+		for g in modutils.pairsByKeys(groups) do
 			local group = groups[g]
 			if not group_exists(group) and not known_bad_groups[group] then
 				print(bad_group_msg .. ": \"" .. group .. "\" (full string: \""..item.."\")")
@@ -59,17 +59,13 @@ local check_item = function(itemstring, bad_item_msg, bad_group_msg, is_output)
 end
 
 -- Check recipes for unknown items and groups
-for name, def in pairs(minetest.registered_items) do
+for name, def in modutils.pairsByKeys(minetest.registered_items) do
 	local recipes_for_item = minetest.get_all_craft_recipes(name)
-	if recipes_for_item then
-		for id, recipe in pairs(recipes_for_item) do
-			if recipe.items then
-				for i=1, #recipe.items do
-					local item = recipe.items[i]
-					if item and item ~= "" then
-						check_item(item, "Unknown input item", "Input group without any items")
-					end
-				end
+	for id, recipe in modutils.pairsByKeys(recipes_for_item) do
+		for i in modutils.pairsByKeys(recipe.items) do
+			local item = recipe.items[i]
+			if item and item ~= "" then
+				check_item(item, "Unknown input item", "Input group without any items")
 			end
 		end
 	end
