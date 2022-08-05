@@ -30,7 +30,7 @@ https://forum.minetest.net/viewtopic.php?f=11&t=15759
 - broken_recipe - Find crafting recipes which require unknown items
 - empty - Empty file for your own checks
 - get_item_csv - Export all registered items in a .CSV file
-- global_variables - List suspicious global variables
+- global_variables - Browse all global variables and see their content
 - graphviz_recipes_all - Make a graphviz .dot file of all items in a recipe dependency tree
 - is_ground_content - This checker lists all nodes for which is_ground_content == true
 - list_entities - Lists all the registered entities (except builtin)
@@ -62,7 +62,7 @@ add the mod to the game you like to test
 
 In all cases - check the debug.txt for test results
 
-### Minetest Configuration parameters
+### Minetest Configuration Parameters
 - print_to_chat:bool Output QA check messages to chat
 - log_to_file:bool Output QA check messages to a file
 - overwrite_log:bool Overwrite the file at every game launch
@@ -70,5 +70,5 @@ In all cases - check the debug.txt for test results
 - date_and_time_format:string Date and time stamp format
 
 ## Credits
-- (Wuzzy2)[https://codeberg.org/Wuzzy] - thanks for ideas, code optimizations and most check scripts
-- (dacmot)[https://www.github.com/dacmot] - for adding output to log file and configuration parameters
+- [Wuzzy2](https://codeberg.org/Wuzzy) - thanks for ideas, code optimizations and most check scripts
+- [dacmot](https://www.github.com/dacmot) - for adding output to log file and configuration parameters
