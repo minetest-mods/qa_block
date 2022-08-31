@@ -13,8 +13,7 @@ local enable_dependency_check = true
 local print_no_recipe = false
 -------------
 
-local modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
-
+local modutils = qa_block.modutils
 
 local function dependency_exists(item1, item2)
 

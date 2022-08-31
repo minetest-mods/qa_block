@@ -3,8 +3,6 @@
 --[[not a node, not a weapon, not a mining tool, not used in any crafting recipe.
 This checker is not perfect and tends to have a couple of false-positives.]]
 
-local modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
-
 local items_in_craft = {}
 for k,v in pairs(minetest.registered_items) do
 	local recps = minetest.get_all_craft_recipes(k)
@@ -82,9 +80,9 @@ local check = function(name, def)
 	print(name)
 end
 
-for name, def in modutils.pairsByKeys(minetest.registered_tools) do
+for name, def in qa_block.modutils.pairsByKeys(minetest.registered_tools) do
 	check(name, def)
 end
-for name, def in modutils.pairsByKeys(minetest.registered_craftitems) do
+for name, def in qa_block.modutils.pairsByKeys(minetest.registered_craftitems) do
 	check(name, def)
 end

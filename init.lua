@@ -18,6 +18,8 @@ qa_block = {}
 qa_block.modpath = minetest.get_modpath(minetest.get_current_modname())
 local filepath = qa_block.modpath.."/checks/"
 
+qa_block.modutils = dofile(qa_block.modpath.."/modutils.lua")
+
 --[[ --temporary buildin usage (again)
 local smartfs_enabled = false
 if minetest.get_modpath("smartfs") and

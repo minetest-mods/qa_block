@@ -2,8 +2,6 @@
 
 --[[ unobtainable by normal means like not dropped or crafted by anything. ]]
 
-local modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
-
 local items = {}
 for item, _ in pairs(minetest.registered_items) do
 	if item ~= "unknown" and item ~= "ignore" and item ~= "air" and item ~= "" then
@@ -38,7 +36,7 @@ for item, def in pairs(minetest.registered_items) do
 	end
 end
 
-for item, obtainable in modutils.pairsByKeys(items) do
+for item, obtainable in qa_block.modutils.pairsByKeys(items) do
 	if obtainable == false then
 		print(item)
 	end
