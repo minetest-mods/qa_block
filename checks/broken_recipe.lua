@@ -2,9 +2,7 @@
 
 -- If true, will also check groups
 local check_groups = true
-
-local modutils = qa_block.modutils
-local pairsByKeys = modutils.pairsByKeys
+local pairsByKeys = qa_block.pairsByKeys
 
 local known_bad_items = {}
 local known_groups = {}
@@ -36,7 +34,7 @@ end
 
 local check_item = function(itemstring, bad_item_msg, bad_group_msg, is_output)
 	local item = ItemStack(itemstring):get_name()
-	local modname = modutils.get_modname_by_itemname(item)
+	local modname = qa_block.modutils.get_modname_by_itemname(item)
 	if modname ~= "group" then
 		if not item_exists(item) and not known_bad_items[item] then
 			known_bad_items[item] = true

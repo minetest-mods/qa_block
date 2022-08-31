@@ -16,9 +16,9 @@ local logfilename = minetest.get_worldpath() .. "/qa_block.log"
 -----------------------------------------------
 qa_block = {}
 qa_block.modpath = minetest.get_modpath(minetest.get_current_modname())
-local filepath = qa_block.modpath.."/checks/"
-
 qa_block.modutils = dofile(qa_block.modpath.."/modutils.lua")
+
+local checks_path = qa_block.modpath.."/checks/"
 
 --[[ --temporary buildin usage (again)
 local smartfs_enabled = false
@@ -36,13 +36,39 @@ qa_block.smartfs = smartfs
 dofile(qa_block.modpath.."/smartfs_forms.lua")
 local smartfs_enabled = true
 
+
+-----------------------------------------------
+-- Return a list of keys sorted - Useful when looking for regressions
+-- https://www.lua.org/pil/19.3.html
+-- Additional helper to be used in checks
+-----------------------------------------------
+function qa_block.pairsByKeys (t)
+	if not t then
+		return function()
+			return nil
+		end
+	end
+
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+	table.sort(a)
+	local i = 0      -- iterator variable
+	local iter = function ()   -- iterator function
+			i = i + 1
+			if a[i] == nil then return nil
+			else return a[i], t[a[i]]
+			end
+	end
+	return iter
+end
+
 -----------------------------------------------
 -- QA-Block functionality - list checks
 -----------------------------------------------
 qa_block.get_checks_list = function()
 	local out = {}
 	local files
-	files = minetest.get_dir_list(filepath, false)
+	files = minetest.get_dir_list(checks_path, false)
 	for f=1, #files do
 		local filename = files[f]
 		local outname, _ext = filename:match("(.*)(.lua)$")
@@ -111,7 +137,7 @@ end
 -- QA-Block functionality - get the source of a module
 -----------------------------------------------
 function qa_block.get_source(check)
-	local file = filepath..check..".lua"
+	local file = checks_path..check..".lua"
 	local f=io.open(file,"r")
 	if not f then
 		return ""
