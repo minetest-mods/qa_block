@@ -80,9 +80,9 @@ local check = function(name, def)
 	print(name)
 end
 
-for name, def in qa_block.modutils.pairsByKeys(minetest.registered_tools) do
+for name, def in qa_block.pairsByKeys(minetest.registered_tools) do
 	check(name, def)
 end
-for name, def in qa_block.modutils.pairsByKeys(minetest.registered_craftitems) do
+for name, def in qa_block.pairsByKeys(minetest.registered_craftitems) do
 	check(name, def)
 end
