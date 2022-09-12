@@ -63,11 +63,11 @@ add the mod to the game you like to test
 In all cases - check the debug.txt for test results
 
 ### Minetest Configuration Parameters
-- print_to_chat:bool Output QA check messages to chat
-- log_to_file:bool Output QA check messages to a file
-- overwrite_log:bool Overwrite the file at every game launch
-- log_date_time:bool Prepend a date and time stamp to log messages
-- date_and_time_format:string Date and time stamp format
+- `qa_block.print_to_chat`, bool. Output QA check messages to chat
+- `qa_block.log_to_file`: bool. Output QA check messages to a file
+- `qa_block.overwrite_log`: bool. Overwrite the file at every game launch
+- `qa_block.log_date_time`: bool. Prepend a date and time stamp to log messages
+- `qa_block.date_and_time_format`: string. Date and time stamp format
 
 ## Credits
 - [Wuzzy2](https://codeberg.org/Wuzzy) - thanks for ideas, code optimizations and most check scripts
