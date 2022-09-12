@@ -2,8 +2,7 @@
 
 -- If true, will also check groups
 local check_groups = true
-
-local modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
+local pairsByKeys = qa_block.pairsByKeys
 
 local known_bad_items = {}
 local known_groups = {}
@@ -35,7 +34,7 @@ end
 
 local check_item = function(itemstring, bad_item_msg, bad_group_msg, is_output)
 	local item = ItemStack(itemstring):get_name()
-	local modname = modutils.get_modname_by_itemname(item)
+	local modname = qa_block.modutils.get_modname_by_itemname(item)
 	if modname ~= "group" then
 		if not item_exists(item) and not known_bad_items[item] then
 			known_bad_items[item] = true
@@ -48,7 +47,7 @@ local check_item = function(itemstring, bad_item_msg, bad_group_msg, is_output)
 			print(bad_group_msg .. ". Full string: \""..item.."\")")
 			return
 		end
-		for g=1, #groups do
+		for g in pairsByKeys(groups) do
 			local group = groups[g]
 			if not group_exists(group) and not known_bad_groups[group] then
 				print(bad_group_msg .. ": \"" .. group .. "\" (full string: \""..item.."\")")
@@ -59,17 +58,13 @@ local check_item = function(itemstring, bad_item_msg, bad_group_msg, is_output)
 end
 
 -- Check recipes for unknown items and groups
-for name, def in pairs(minetest.registered_items) do
+for name, def in pairsByKeys(minetest.registered_items) do
 	local recipes_for_item = minetest.get_all_craft_recipes(name)
-	if recipes_for_item then
-		for id, recipe in pairs(recipes_for_item) do
-			if recipe.items then
-				for i=1, #recipe.items do
-					local item = recipe.items[i]
-					if item and item ~= "" then
-						check_item(item, "Unknown input item", "Input group without any items")
-					end
-				end
+	for id, recipe in pairsByKeys(recipes_for_item) do
+		for i in pairsByKeys(recipe.items) do
+			local item = recipe.items[i]
+			if item and item ~= "" then
+				check_item(item, "Unknown input item", "Input group without any items")
 			end
 		end
 	end

@@ -11,7 +11,7 @@ local blacklist = {
 	wool = true,
 }
 
-for item, def in pairs(minetest.registered_items) do
+for item, def in qa_block.pairsByKeys(minetest.registered_items) do
 	if item:find(':') then
 		local mod_name, item_name = unpack(item:split(':'))
 		if not blacklist[mod_name] and not def.groups.not_in_creative_inventory then

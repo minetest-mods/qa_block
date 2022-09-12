@@ -14,7 +14,7 @@ for k,v in pairs(minetest.registered_items) do
 				if recp.width == 0 then
 					table_length = #recp.items
 				else
-					table_length = math.pow(recp.width, 2)
+					table_length = recp.width * recp.width
 				end
 				for i=1, table_length do
 					if recp.items[i] ~= nil then
@@ -80,9 +80,9 @@ local check = function(name, def)
 	print(name)
 end
 
-for name, def in pairs(minetest.registered_tools) do
+for name, def in qa_block.pairsByKeys(minetest.registered_tools) do
 	check(name, def)
 end
-for name, def in pairs(minetest.registered_craftitems) do
+for name, def in qa_block.pairsByKeys(minetest.registered_craftitems) do
 	check(name, def)
 end

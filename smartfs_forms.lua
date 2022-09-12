@@ -34,18 +34,21 @@ local function _check_selection_dialog(state)
 	update_fileslist(listbox)
 
 	listbox:onClick(function(self, state, index)
-		state:get("textarea"):setText(qa_block.get_source(self:getItem(index)))
+		qa_block.selection = self:getItem(index)
+		state:get("textarea"):setText(qa_block.get_source(qa_block.selection))
 	end)
 
 	listbox:onDoubleClick(function(self,state, index)
-		state:get("textarea"):setText(qa_block.get_source(self:getItem(index)))
-		qa_block.do_module(self:getItem(index))
+		qa_block.selection = self:getItem(index)
+		state:get("textarea"):setText(qa_block.get_source(qa_block.selection))
+		qa_block.do_module(qa_block.selection)
 	end)
 
 	-- Run Button
 	local runbutton = state:button(10,7,2,0.5,"Run","Run")
 	runbutton:onClick(function(self)
-		qa_block.do_source(textarea:getText(), "from textarea")
+		local check = qa_block.selection or ""
+		qa_block.do_source(textarea:getText(), check.." from textarea")
 	end)
 
 	-- Refersh Button

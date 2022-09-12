@@ -36,7 +36,7 @@ for item, def in pairs(minetest.registered_items) do
 	end
 end
 
-for item, obtainable in pairs(items) do
+for item, obtainable in qa_block.pairsByKeys(items) do
 	if obtainable == false then
 		print(item)
 	end

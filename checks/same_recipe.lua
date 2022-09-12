@@ -13,10 +13,7 @@ local enable_dependency_check = true
 local print_no_recipe = false
 -------------
 
-local modutils
-if enable_dependency_check then
-	modutils = dofile(minetest.get_modpath("qa_block").."/modutils.lua")
-end
+local modutils = qa_block.modutils
 
 local function dependency_exists(item1, item2)
 
@@ -134,7 +131,7 @@ local known_recipes = {}
 
 -- load and execute file each click
 --for name, def in pairs(minetest.registered_nodes) do
-for name, def in pairs(minetest.registered_items) do
+for name, def in qa_block.pairsByKeys(minetest.registered_items) do
 
 	if (not def.groups.not_in_creative_inventory or
 	   def.groups.not_in_creative_inventory == 0) and

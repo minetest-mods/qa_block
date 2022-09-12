@@ -2,7 +2,7 @@
 
 -- Sounds are always optional, but most nodes SHOULD have sounds for good quality.
 
-for name, def in pairs(minetest.registered_nodes) do
+for name, def in qa_block.pairsByKeys(minetest.registered_nodes) do
 	local complaints = {}
 	local failed = false
 	-- Air and ignore are allowed to be silent

@@ -1,0 +1,5 @@
+qa_block.print_to_chat (Output qa check messages to chat) bool true
+qa_block.log_to_file (Output qa check messages to a file) bool false
+qa_block.overwrite_log (Overwrite log file on game launch) bool false
+qa_block.log_date_time (Prepend a date and time stamp to log messages) bool false
+qa_block.date_time_format (Date and time stamp format) string %Y-%m-%d %H:%M:%S
