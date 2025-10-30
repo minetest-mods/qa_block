@@ -33,7 +33,9 @@ https://forum.minetest.net/viewtopic.php?f=11&t=15759
 - global_variables - List suspicious global variables
 - graphviz_recipes_all - Make a graphviz .dot file of all items in a recipe dependency tree
 - is_ground_content - This checker lists all nodes for which is_ground_content == true
+- list_cooking_recipes - List all the registered cooking recipes
 - list_entities - Lists all the registered entities (except builtin)
+- list_fuels - List all the registered fuel recipes
 - list_spawning_mobs - List entities that are mobs from mobs_redo or compatible framework
 - no_doc_items_help - Lists all items without item usage help or long description
 - no_item_description - Lists all items without description
