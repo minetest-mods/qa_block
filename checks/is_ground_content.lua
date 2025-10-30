@@ -15,7 +15,7 @@ Recommended values for is_ground_content:
   Examples: Chests, furnaces, fences, ladders, stone bricks, etc.]]
 
 for name, def in pairs(minetest.registered_nodes) do
-	if def.is_ground_content then
+	if name ~= "unknown" and name ~= "air" and name ~= "ignore" and name ~= "qa_block:block" and def.is_ground_content then
 		print(name)
 	end
 end
