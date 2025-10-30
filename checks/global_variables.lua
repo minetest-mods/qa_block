@@ -1,13 +1,13 @@
 -- List suspicious global variables
 
---[[ most buildins and known needed globals are blacklisted to not spam
+--[[ Most built-in and known global variables are blacklisted to not spam
 the output. The second blacklist are maybe-known bugs in released
-minetest or minetest_game. You can disable the second blacklist if you
-need to check the core functionality ]]
+Luanti or Minetest Game. You can disable the second blacklist if you
+need to check the core functionality. ]]
 
 local enable_second_blacklist = true
 
--- Lua needed things https://www.lua.org/manual/5.1/
+-- Lua-needed things <https://www.lua.org/manual/5.1/>
 local blacklist = {
 	_G = true,
 	_VERSION = true,
@@ -54,7 +54,7 @@ local blacklist = {
 	-- undocumented / deprecated in Lua 5.1
 	newproxy = true,
 
--- minetest related needed globals
+	-- Luanti-related needed globals
 	minetest = true,
 	core = true,
 	dump = true,
@@ -62,7 +62,7 @@ local blacklist = {
 	Raycast = true,
 }
 
--- part of minetest builtin, but needs to be discussed if it right or wrong
+-- Part of Luanti builtin, but needs to be discussed if it's right or wrong
 local second_blacklist = {
 	PerlinNoise = true,
 	PerlinNoiseMap = true,
@@ -74,6 +74,11 @@ local second_blacklist = {
 	PseudoRandom = true,
 	ItemStack = true,
 	Settings = true,
+	ValueNoise = true,
+	ValueNoiseMap = true,
+
+	bit = true,
+	vector = true,
 
 	cleanup_path = true,
 	gcinfo = true,
@@ -92,10 +97,9 @@ local second_blacklist = {
 	DIR_DELIM = true,
 	PLATFORM = true,
 
--- minetest_game
+	-- Minetest Game
 	LIGHT_MAX = true,
 	LAVA_VISC = true,
-	vector = true,
 	WATER_VISC = true,
 	WATER_ALPHA = true,
 }
