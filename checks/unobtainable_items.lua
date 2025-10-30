@@ -4,7 +4,7 @@
 
 local items = {}
 for item, _ in pairs(minetest.registered_items) do
-	if item ~= "unknown" and item ~= "ignore" and item ~= "air" and item ~= "" then
+	if item ~= "unknown" and item ~= "ignore" and item ~= "air" and item ~= "qa_block:block" and item ~= "" then
 		items[item] = false
 	end
 end

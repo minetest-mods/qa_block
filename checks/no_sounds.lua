@@ -5,8 +5,8 @@
 for name, def in qa_block.pairsByKeys(minetest.registered_nodes) do
 	local complaints = {}
 	local failed = false
-	-- Air and ignore are allowed to be silent
-	if name == "air" or name == "ignore" then
+	-- Air, ignore and the QA block are allowed to be silent
+	if name == "air" or name == "ignore" or name == "qa_block:block" then
 		-- No complaints
 	
 	-- No sounds at all
