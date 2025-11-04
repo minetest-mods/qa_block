@@ -1,9 +1,9 @@
 -- List suspicious global variables
 
 --[[ Most built-in and known global variables are blacklisted to not spam
-the output. The second blacklist are maybe-known bugs in released
-Luanti or Minetest Game. You can disable the second blacklist if you
-need to check the core functionality. ]]
+the output. The first blacklist is for core Lua globals for Lua 5.1.
+The second blacklist are for globals added by Luanti (as of 5.14.0).
+You can disable the second blacklist if you wish. ]]
 
 local enable_second_blacklist = true
 
@@ -53,17 +53,16 @@ local blacklist = {
 
 	-- undocumented / deprecated in Lua 5.1
 	newproxy = true,
+}
 
-	-- Luanti-related needed globals
+-- Luanti-needed things
+local second_blacklist = {
 	minetest = true,
 	core = true,
 	dump = true,
 	dump2 = true,
 	Raycast = true,
-}
 
--- Part of Luanti builtin
-local second_blacklist = {
 	PerlinNoise = true,
 	PerlinNoiseMap = true,
 	VoxelManip = true,
