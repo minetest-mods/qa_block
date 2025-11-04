@@ -62,7 +62,7 @@ local blacklist = {
 	Raycast = true,
 }
 
--- Part of Luanti builtin, but needs to be discussed if it's right or wrong
+-- Part of Luanti builtin
 local second_blacklist = {
 	PerlinNoise = true,
 	PerlinNoiseMap = true,
@@ -80,28 +80,9 @@ local second_blacklist = {
 	bit = true,
 	vector = true,
 
-	cleanup_path = true,
-	gcinfo = true,
-	on_placenode = true,
-	hack_nodes = true,
-	file_exists = true,
-	nodeupdate = true,
-	check_attached_node = true,
-	drop_attached_node = true,
-	get_last_folder = true,
-	spawn_falling_node = true,
-	on_dignode = true,
-	basic_dump = true,
-	nodeupdate_single = true,
 	INIT = true,
 	DIR_DELIM = true,
 	PLATFORM = true,
-
-	-- Minetest Game
-	LIGHT_MAX = true,
-	LAVA_VISC = true,
-	WATER_VISC = true,
-	WATER_ALPHA = true,
 }
 
 
