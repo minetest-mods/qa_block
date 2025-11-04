@@ -1,13 +1,13 @@
 -- List suspicious global variables
 
---[[ most buildins and known needed globals are blacklisted to not spam
-the output. The second blacklist are maybe-known bugs in released
-minetest or minetest_game. You can disable the second blacklist if you
-need to check the core functionality ]]
+--[[ Most built-in and known global variables are blacklisted to not spam
+the output. The first blacklist is for core Lua globals for Lua 5.1.
+The second blacklist are for globals added by Luanti (as of 5.14.0).
+You can disable the second blacklist if you wish. ]]
 
 local enable_second_blacklist = true
 
--- Lua needed things https://www.lua.org/manual/5.1/
+-- Lua-needed things <https://www.lua.org/manual/5.1/>
 local blacklist = {
 	_G = true,
 	_VERSION = true,
@@ -53,17 +53,16 @@ local blacklist = {
 
 	-- undocumented / deprecated in Lua 5.1
 	newproxy = true,
+}
 
--- minetest related needed globals
+-- Luanti-needed things
+local second_blacklist = {
 	minetest = true,
 	core = true,
 	dump = true,
 	dump2 = true,
 	Raycast = true,
-}
 
--- part of minetest builtin, but needs to be discussed if it right or wrong
-local second_blacklist = {
 	PerlinNoise = true,
 	PerlinNoiseMap = true,
 	VoxelManip = true,
@@ -74,30 +73,15 @@ local second_blacklist = {
 	PseudoRandom = true,
 	ItemStack = true,
 	Settings = true,
+	ValueNoise = true,
+	ValueNoiseMap = true,
 
-	cleanup_path = true,
-	gcinfo = true,
-	on_placenode = true,
-	hack_nodes = true,
-	file_exists = true,
-	nodeupdate = true,
-	check_attached_node = true,
-	drop_attached_node = true,
-	get_last_folder = true,
-	spawn_falling_node = true,
-	on_dignode = true,
-	basic_dump = true,
-	nodeupdate_single = true,
+	bit = true,
+	vector = true,
+
 	INIT = true,
 	DIR_DELIM = true,
 	PLATFORM = true,
-
--- minetest_game
-	LIGHT_MAX = true,
-	LAVA_VISC = true,
-	vector = true,
-	WATER_VISC = true,
-	WATER_ALPHA = true,
 }
 
 
